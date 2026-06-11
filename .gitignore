@@ -1,0 +1,7 @@
+node_modules
+.next
+out
+.env
+.env.local
+ecoloop-4391d-firebase-adminsdk-fbsvc-42e39dcf45.json
+.env.example
