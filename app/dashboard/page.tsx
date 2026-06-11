@@ -19,7 +19,7 @@ interface ScanDoc {
   confidenceScore?: number;
   createdAt?: { seconds?: number };
   imageUrl?: string;
-  suggestions?: Array<{ estimatedCo2SavedKg?: number; title?: string }>;
+  suggestions?: Array<{ id?: string; estimatedCo2SavedKg?: number; title?: string }>;
 }
 
 interface ProjectDoc {
@@ -221,7 +221,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge>{scan.confidenceScore ? `${Math.round(scan.confidenceScore * 100)}% confidence` : 'Awaiting AI'}</Badge>
-                      <Button variant="ghost" size="icon" className="text-red-400 hover:text-red-300" onClick={() => deleteScan(scan.id)} title="Delete scan">
+                      <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => deleteScan(scan.id)} title="Delete scan">
                         <Trash2 size={16} />
                       </Button>
                     </div>
@@ -247,8 +247,8 @@ export default function DashboardPage() {
                       <p className="text-sm text-slate-300">Ready to start</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline">Saved</Badge>
-                      <Button variant="ghost" size="icon" className="text-red-400 hover:text-red-300" onClick={() => deleteProject(project.id)} title="Delete project">
+                      <Badge className="border-slate-500/30 bg-slate-500/10 text-slate-300">Saved</Badge>
+                      <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => deleteProject(project.id)} title="Delete project">
                         <Trash2 size={16} />
                       </Button>
                     </div>
@@ -271,8 +271,8 @@ export default function DashboardPage() {
                       <p className="text-sm text-slate-300">In progress</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant="secondary">In progress</Badge>
-                      <Button variant="ghost" size="icon" className="text-red-400 hover:text-red-300" onClick={() => deleteProject(project.id)} title="Delete project">
+                      <Badge className="border-brand-500/30 bg-brand-500/10 text-brand-100">In progress</Badge>
+                      <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => deleteProject(project.id)} title="Delete project">
                         <Trash2 size={16} />
                       </Button>
                     </div>
@@ -295,8 +295,8 @@ export default function DashboardPage() {
                       <p className="text-sm text-slate-300">Completed</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant="default">Completed</Badge>
-                      <Button variant="ghost" size="icon" className="text-red-400 hover:text-red-300" onClick={() => deleteProject(project.id)} title="Delete project">
+                      <Badge className="border-green-500/30 bg-green-500/10 text-green-300">Completed</Badge>
+                      <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => deleteProject(project.id)} title="Delete project">
                         <Trash2 size={16} />
                       </Button>
                     </div>

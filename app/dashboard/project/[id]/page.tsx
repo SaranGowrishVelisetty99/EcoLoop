@@ -40,7 +40,7 @@ export default function ProjectPage() {
   const params = useParams();
   const router = useRouter();
   const projectId = Array.isArray(params.id) ? params.id[0] : params.id;
-  const [user, setUser] = useState<{ uid: string; email?: string } | null>(null);
+  const [user, setUser] = useState<{ uid: string; email: string | null } | null>(null);
   const [project, setProject] = useState<ProjectDoc | null>(null);
   const [scan, setScan] = useState<ScanDoc | null>(null);
   const [loading, setLoading] = useState(true);
