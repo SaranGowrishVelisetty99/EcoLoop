@@ -10,11 +10,19 @@ function getAdminApp() {
   const apps = getApps();
   if (apps.length) return apps[0];
 
-  const serviceAccountPath = process.env.FIREBASE_ADMIN_SERVICE_ACCOUNT;
-  if (serviceAccountPath) {
+  const serviceAccountEnv = process.env.FIREBASE_ADMIN_SERVICE_ACCOUNT;
+  if (serviceAccountEnv) {
     try {
-      const resolvedPath = path.resolve(serviceAccountPath);
-      const serviceAccount = JSON.parse(fs.readFileSync(resolvedPath, 'utf8'));
+      let serviceAccount: any;
+
+      const trimmed = serviceAccountEnv.trim();
+      if (trimmed.startsWith('{')) {
+        serviceAccount = JSON.parse(trimmed);
+      } else {
+        const resolvedPath = path.resolve(trimmed);
+        serviceAccount = JSON.parse(fs.readFileSync(resolvedPath, 'utf8'));
+      }
+
       return initializeApp({
         credential: cert(serviceAccount),
         projectId,
