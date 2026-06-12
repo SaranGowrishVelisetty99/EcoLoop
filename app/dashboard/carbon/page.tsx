@@ -114,10 +114,12 @@ export default function CarbonFootprintPage() {
           </div>
         </section>
 
-        <section className="mt-8" aria-labelledby="goals-heading">
-          <h2 id="goals-heading" className="sr-only">Carbon Reduction Goals</h2>
-          <CarbonFootprintGoals currentFootprint={footprintResult} userId={userId || ''} />
-        </section>
+        {userId && (
+          <section className="mt-8" aria-labelledby="goals-heading">
+            <h2 id="goals-heading" className="sr-only">Carbon Reduction Goals</h2>
+            <CarbonFootprintGoals currentFootprint={footprintResult} userId={userId} />
+          </section>
+        )}
 
         <section className="mt-8" aria-labelledby="how-it-works-heading">
           <h2 id="how-it-works-heading" className="sr-only">How this works</h2>

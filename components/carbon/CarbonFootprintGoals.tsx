@@ -22,13 +22,21 @@ export function CarbonFootprintGoals({ currentFootprint, userId }: CarbonFootpri
     if (!userId) return;
     const loadGoals = async () => {
       try {
-        const res = await fetch(`/api/carbon-goals?userId=${userId}`);
+        const res = await fetch(`/api/carbon-goals?userId=${userId}&_t=${Date.now()}`, {
+          cache: 'no-store',
+        });
+        console.log('[CarbonGoals] Response status:', res.status);
         if (res.ok) {
           const data = await res.json();
+          console.log('[CarbonGoals] API response:', data);
           setGoals(data.goals || []);
+        } else {
+          console.error('[CarbonGoals] API error:', res.status);
+          setGoals([]);
         }
       } catch (e) {
         console.error('Failed to load goals:', e);
+        setGoals([]);
       } finally {
         setLoading(false);
       }
@@ -37,7 +45,10 @@ export function CarbonFootprintGoals({ currentFootprint, userId }: CarbonFootpri
   }, [userId]);
 
   const handleCreateGoal = async () => {
-    if (!userId) return;
+    if (!userId || userId.trim() === '') {
+      alert('User not authenticated. Please sign in again.');
+      return;
+    }
     if (!currentFootprint) {
       alert('Please calculate your carbon footprint first before creating a goal.');
       return;
@@ -49,6 +60,7 @@ export function CarbonFootprintGoals({ currentFootprint, userId }: CarbonFootpri
       const res = await fetch('/api/carbon-goals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
         body: JSON.stringify({
           userId,
           targetReductionPercentage: newGoal.targetReductionPercentage,
@@ -56,7 +68,9 @@ export function CarbonFootprintGoals({ currentFootprint, userId }: CarbonFootpri
           baselineTotalKgCo2: currentFootprint.totalKgCo2PerYear,
         }),
       });
+      console.log('[CarbonGoals] Create response status:', res.status);
       const data = await res.json();
+      console.log('[CarbonGoals] Create response data:', data);
       if (res.ok) {
         setGoals(prev => [...prev, data.goal]);
         setShowForm(false);
@@ -72,8 +86,13 @@ export function CarbonFootprintGoals({ currentFootprint, userId }: CarbonFootpri
 
   const handleDeleteGoal = async (goalId: string) => {
     try {
-      const res = await fetch(`/api/carbon-goals/${goalId}?userId=${userId}`, { method: 'DELETE' });
+      const res = await fetch(`/api/carbon-goals/${goalId}?userId=${userId}`, { 
+        method: 'DELETE',
+        cache: 'no-store',
+      });
+      console.log('[CarbonGoals] Delete response status:', res.status);
       const data = await res.json();
+      console.log('[CarbonGoals] Delete response data:', data);
       if (res.ok) {
         setGoals(prev => prev.filter(g => g.id !== goalId));
       } else {
