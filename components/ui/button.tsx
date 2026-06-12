@@ -24,12 +24,34 @@ const buttonVariants = cva(
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  loading?: boolean;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ className, variant, size, asChild = false, ...props }, ref) => {
-  const Comp = asChild ? Slot : 'button';
-  return <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />;
-});
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, loading, children, disabled, 'aria-label': ariaLabel, ...props }, ref) => {
+    const Comp = asChild ? Slot : 'button';
+    const isDisabled = disabled || loading;
+    const buttonProps = {
+      className: cn(buttonVariants({ variant, size, className })),
+      ref,
+      ...props,
+    };
+    if (!asChild) {
+      Object.assign(buttonProps, {
+        disabled: isDisabled,
+        'aria-disabled': isDisabled,
+        'aria-busy': loading,
+        'aria-label': ariaLabel,
+      });
+    }
+    return (
+      <Comp {...buttonProps}>
+        {!asChild && loading && <span className="mr-2" aria-hidden="true">⏳</span>}
+        {children}
+      </Comp>
+    );
+  }
+);
 Button.displayName = 'Button';
 
 export { Button, buttonVariants };

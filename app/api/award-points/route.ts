@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Points already awarded' }, { status: 400 });
     }
 
-    await db.runTransaction(async (transaction) => {
+    await db.runTransaction(async (transaction: any) => {
       const userRef = db.collection('users').doc(decoded.uid);
       transaction.update(userRef, {
         points: adminFieldValue.increment(points),
@@ -66,7 +66,7 @@ function ensureAdminDb() {
   if (!adminDb) {
     throw new Error('Firebase Admin not initialized. Set FIREBASE_ADMIN_SERVICE_ACCOUNT env var or run gcloud auth application-default login.');
   }
-  return adminDb;
+  return adminDb.get();
 }
 
 function decodeJwtPayload(token: string) {

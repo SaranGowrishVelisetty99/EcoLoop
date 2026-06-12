@@ -7,13 +7,13 @@ function ensureAdminDb() {
   if (!adminDb) {
     throw new Error('Firebase Admin not initialized. Set FIREBASE_ADMIN_SERVICE_ACCOUNT env var or run gcloud auth application-default login.');
   }
-  return adminDb;
+  return adminDb.get();
 }
 
 async function awardPoints(uid: string, email: string | undefined, points: number) {
   const db = ensureAdminDb();
   const userRef = db.collection('users').doc(uid);
-  await db.runTransaction(async (transaction) => {
+  await db.runTransaction(async (transaction: any) => {
     const userDoc = await transaction.get(userRef);
     if (userDoc.exists) {
       transaction.update(userRef, {
@@ -22,6 +22,7 @@ async function awardPoints(uid: string, email: string | undefined, points: numbe
     } else {
       transaction.set(userRef, {
         uid,
+        email: email || '',
         username: email || uid,
         points,
         createdAt: adminFieldValue.serverTimestamp(),

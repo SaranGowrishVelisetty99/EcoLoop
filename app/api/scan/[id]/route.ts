@@ -39,7 +39,7 @@ export async function DELETE(
 
     const projectsQuery = db.collection('userProjects').where('scanId', '==', scanId);
     const projectsSnapshot = await projectsQuery.get();
-    projectsSnapshot.docs.forEach((doc) => {
+    projectsSnapshot.docs.forEach((doc: any) => {
       batch.delete(doc.ref);
     });
 
@@ -57,7 +57,7 @@ function ensureAdminDb() {
   if (!adminDb) {
     throw new Error('Firebase Admin not initialized. Set FIREBASE_ADMIN_SERVICE_ACCOUNT env var or run gcloud auth application-default login.');
   }
-  return adminDb;
+  return adminDb.get();
 }
 
 function decodeJwtPayload(token: string) {

@@ -47,7 +47,7 @@ function ensureAdminDb() {
   if (!adminDb) {
     throw new Error('Firebase Admin not initialized. Set FIREBASE_ADMIN_SERVICE_ACCOUNT env var or run gcloud auth application-default login.');
   }
-  return adminDb;
+  return adminDb.get();
 }
 
 function decodeJwtPayload(token: string) {

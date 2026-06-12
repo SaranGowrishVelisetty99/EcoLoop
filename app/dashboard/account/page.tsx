@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { onAuthStateChanged, updateProfile } from 'firebase/auth';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { User, Mail, Save, Loader2, ChevronLeft, AlertCircle, CheckCircle } from 'lucide-react';
@@ -15,6 +15,19 @@ export default function AccountPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const messageAnnouncerRef = useRef<HTMLDivElement>(null);
+
+  const announceMessage = (msg: string) => {
+    if (messageAnnouncerRef.current) {
+      messageAnnouncerRef.current.textContent = msg;
+    }
+  };
+
+  useEffect(() => {
+    if (message) {
+      announceMessage(message.text);
+    }
+  }, [message]);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (currentUser) => {
@@ -60,7 +73,7 @@ export default function AccountPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[linear-gradient(135deg,#03110d_0%,#071c17_45%,#020617_100%)] text-slate-100 flex items-center justify-center">
+      <main id="main-content" className="min-h-screen bg-[linear-gradient(135deg,#03110d_0%,#071c17_45%,#020617_100%)] text-slate-100 flex items-center justify-center">
         <Loader2 className="animate-spin text-brand-400" size={32} />
       </main>
     );
@@ -68,7 +81,7 @@ export default function AccountPage() {
 
   if (!user) {
     return (
-      <main className="min-h-screen bg-[linear-gradient(135deg,#03110d_0%,#071c17_45%,#020617_100%)] text-slate-100 p-8">
+      <main id="main-content" className="min-h-screen bg-[linear-gradient(135deg,#03110d_0%,#071c17_45%,#020617_100%)] text-slate-100 p-8">
         <Card className="mx-auto max-w-xl p-8 text-center">
           <User className="mx-auto text-slate-500" size={48} />
           <h1 className="mt-4 text-xl font-semibold text-white">Sign in to access your account</h1>
@@ -78,18 +91,19 @@ export default function AccountPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(135deg,#03110d_0%,#071c17_45%,#020617_100%)] text-slate-100">
+    <main id="main-content" className="min-h-screen bg-[linear-gradient(135deg,#03110d_0%,#071c17_45%,#020617_100%)] text-slate-100" role="main">
+      <div ref={messageAnnouncerRef} aria-live="polite" aria-atomic="true" className="sr-only" />
       <section className="mx-auto flex min-h-screen w-full max-w-xl flex-col px-6 py-8 lg:px-10">
-        <header className="flex flex-wrap items-center justify-between gap-4 rounded-[28px] border border-white/10 bg-white/5 p-5 shadow-soft backdrop-blur-xl">
+        <header className="flex flex-wrap items-center justify-between gap-4 rounded-[28px] border border-white/10 bg-white/5 p-5 shadow-soft backdrop-blur-xl" role="banner">
           <div className="flex items-center gap-3">
-            <User className="text-brand-400" size={28} />
+            <User className="text-brand-400" size={28} aria-hidden="true" />
             <div>
               <p className="text-xs uppercase tracking-[0.18em] text-brand-100">EcoLoop</p>
               <h1 className="text-3xl font-semibold text-white">My Account</h1>
             </div>
           </div>
-          <a href="/dashboard" className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors">
-            <ChevronLeft size={18} />
+          <a href="/dashboard" className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors" aria-label="Go back to dashboard">
+            <ChevronLeft size={18} aria-hidden="true" />
             <span>Back to dashboard</span>
           </a>
         </header>
@@ -97,69 +111,82 @@ export default function AccountPage() {
         <Card className="mt-8 p-6">
           <CardHeader className="p-0 pb-6">
             <CardTitle className="flex items-center gap-2">
-              <User className="text-brand-400" size={24} />
+              <User className="text-brand-400" size={24} aria-hidden="true" />
               Profile Settings
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0 space-y-6">
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm text-slate-300">Email</label>
-              <div className="flex items-center gap-3 rounded-3xl border border-white/10 bg-slate-950/70 px-4 py-3">
-                <Mail className="text-slate-400" size={18} />
-                <Input
-                  id="email"
-                  value={user.email || ''}
-                  disabled
-                  className="bg-transparent border-0 focus:ring-0 text-slate-100"
-                />
+            <form aria-labelledby="profile-settings-heading" noValidate>
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-sm text-slate-300">Email</label>
+                <div className="flex items-center gap-3 rounded-3xl border border-white/10 bg-slate-950/70 px-4 py-3">
+                  <Mail className="text-slate-400" size={18} aria-hidden="true" />
+                  <Input
+                    id="email"
+                    value={user.email || ''}
+                    disabled
+                    className="bg-transparent border-0 focus:ring-0 text-slate-100"
+                    aria-describedby="email-hint"
+                    aria-readonly="true"
+                  />
+                </div>
+                <p id="email-hint" className="text-xs text-slate-500">Email cannot be changed</p>
               </div>
-              <p className="text-xs text-slate-500">Email cannot be changed</p>
-            </div>
 
-            <div className="space-y-2">
-              <label htmlFor="username" className="text-sm text-slate-300">Username</label>
-              <div className="flex items-center gap-3 rounded-3xl border border-white/10 bg-slate-950/70 px-4 py-3">
-                <User className="text-slate-400" size={18} />
-                <Input
-                  id="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="bg-transparent border-0 focus:ring-0 text-slate-100"
-                  placeholder="Enter your username"
-                  maxLength={30}
-                />
+              <div className="space-y-2">
+                <label htmlFor="username" className="text-sm text-slate-300">Username</label>
+                <div className="flex items-center gap-3 rounded-3xl border border-white/10 bg-slate-950/70 px-4 py-3">
+                  <User className="text-slate-400" size={18} aria-hidden="true" />
+                  <Input
+                    id="username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="bg-transparent border-0 focus:ring-0 text-slate-100"
+                    placeholder="Enter your username"
+                    maxLength={30}
+                    aria-describedby="username-hint"
+                    aria-required="true"
+                  />
+                </div>
+                <p id="username-hint" className="text-xs text-slate-500">This will be displayed on the leaderboard</p>
               </div>
-              <p className="text-xs text-slate-500">This will be displayed on the leaderboard</p>
-            </div>
 
-            {message && (
-              <div className={`flex items-center gap-3 p-4 rounded-3xl ${
-                message.type === 'success'
-                  ? 'bg-green-500/20 border border-green-500/30 text-green-400'
-                  : 'bg-red-500/20 border border-red-500/30 text-red-400'
-              }`}>
-                {message.type === 'success' ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
-                <span>{message.text}</span>
-              </div>
-            )}
-
-            <Button
-              onClick={handleSave}
-              disabled={saving || !username.trim()}
-              className="w-full"
-            >
-              {saving ? (
-                <>
-                  <Loader2 className="mr-2 animate-spin" size={18} />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="mr-2" size={18} />
-                  Save Changes
-                </>
+              {message && (
+                <div
+                  className={`flex items-center gap-3 p-4 rounded-3xl ${
+                    message.type === 'success'
+                      ? 'bg-green-500/20 border border-green-500/30 text-green-400'
+                      : 'bg-red-500/20 border border-red-500/30 text-red-400'
+                  }`}
+                  role="alert"
+                  aria-live="assertive"
+                  aria-atomic="true"
+                >
+                  {message.type === 'success' ? <CheckCircle size={20} aria-hidden="true" /> : <AlertCircle size={20} aria-hidden="true" />}
+                  <span>{message.text}</span>
+                </div>
               )}
-            </Button>
+
+              <Button
+                type="submit"
+                onClick={handleSave}
+                disabled={saving || !username.trim()}
+                className="w-full"
+                aria-busy={saving}
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="mr-2 animate-spin" size={18} aria-hidden="true" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2" size={18} aria-hidden="true" />
+                    Save Changes
+                  </>
+                )}
+              </Button>
+            </form>
           </CardContent>
         </Card>
       </section>

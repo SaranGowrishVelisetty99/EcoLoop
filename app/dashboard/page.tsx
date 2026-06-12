@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, onSnapshot, query, where, doc } from 'firebase/firestore';
-import { Leaf, Recycle, Sparkles, TimerReset, FolderOpen, CheckCircle, Award, Trash2, Trophy, User, type LucideIcon } from 'lucide-react';
+import { Leaf, Recycle, Sparkles, TimerReset, FolderOpen, CheckCircle, Award, Trash2, Trophy, User, Calculator, type LucideIcon } from 'lucide-react';
 import { auth, db } from '@/lib/firebase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -152,14 +152,14 @@ export default function DashboardPage() {
 
   if (!userId) {
     return (
-      <main className="min-h-screen bg-[linear-gradient(135deg,#03110d_0%,#071c17_45%,#020617_100%)] text-slate-100 p-8">
-        <Card className="mx-auto max-w-3xl p-8 text-center">
-          <Leaf className="mx-auto text-brand-400" size={30} />
+      <main id="main-content" className="min-h-screen bg-[linear-gradient(135deg,#03110d_0%,#071c17_45%,#020617_100%)] text-slate-100 p-8">
+        <Card className="mx-auto max-w-3xl p-8 text-center" role="region" aria-label="Sign in required">
+          <Leaf className="mx-auto text-brand-400" size={30} aria-hidden="true" />
           <h1 className="mt-4 text-2xl font-semibold text-white">Sign in to view your upcycling dashboard.</h1>
           <p className="mt-2 text-slate-200/80">Authentication is required to load your scans, project progress, and sustainability metrics.</p>
           <div className="mt-6 flex justify-center gap-3">
-            <Button asChild><Link href="/auth">Go to sign-in</Link></Button>
-            <Button variant="outline" asChild><Link href="/dashboard/scan">Open scanner</Link></Button>
+            <Button onClick={() => window.location.href = '/auth'}>Go to sign-in</Button>
+            <Button variant="outline" onClick={() => window.location.href = '/dashboard/scan'}>Open scanner</Button>
           </div>
         </Card>
       </main>
@@ -176,39 +176,48 @@ export default function DashboardPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(135deg,#03110d_0%,#071c17_45%,#020617_100%)] text-slate-100">
+    <main id="main-content" className="min-h-screen bg-[linear-gradient(135deg,#03110d_0%,#071c17_45%,#020617_100%)] text-slate-100">
       <section className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-6 py-8 lg:px-10">
-        <header className="flex flex-wrap items-center justify-between gap-4 rounded-[28px] border border-white/10 bg-white/5 p-5 shadow-soft backdrop-blur-xl">
+        <header className="flex flex-wrap items-center justify-between gap-4 rounded-[28px] border border-white/10 bg-white/5 p-5 shadow-soft backdrop-blur-xl" role="banner">
           <div>
             <p className="text-xs tracking-[0.18em] text-brand-100">EcoLoop dashboard</p>
             {username && <p className="mt-1 text-sm text-brand-400 font-medium">Welcome, {username}</p>}
             <h1 className="text-3xl font-semibold text-white">Track scans, projects, and carbon mitigation.</h1>
           </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" asChild><Link href="/dashboard/scan">New scan</Link></Button>
-            <Button variant="outline" asChild><Link href="/dashboard/leaderboard"><Trophy className="mr-2" size={16} />Leaderboard</Link></Button>
-            <Button variant="outline" asChild><Link href="/dashboard/account"><User className="mr-2" size={16} />Account</Link></Button>
+          <nav aria-label="Dashboard navigation" className="flex items-center gap-3">
+            <Button variant="outline" onClick={() => router.push('/dashboard/scan')}>New scan</Button>
+            <Button variant="outline" onClick={() => router.push('/dashboard/carbon')}>
+              <Calculator className="mr-2" size={16} aria-hidden="true" />Carbon Footprint
+            </Button>
+            <Button variant="outline" onClick={() => router.push('/dashboard/leaderboard')}>
+              <Trophy className="mr-2" size={16} aria-hidden="true" />Leaderboard
+            </Button>
+            <Button variant="outline" onClick={() => router.push('/dashboard/account')}>
+              <User className="mr-2" size={16} aria-hidden="true" />Account
+            </Button>
             <Button onClick={handleSignOut}>Sign out</Button>
-          </div>
+          </nav>
         </header>
 
-        <section className="mt-8 grid gap-6 md:grid-cols-3">
+        <section className="mt-8 grid gap-6 md:grid-cols-3" aria-labelledby="summary-heading">
+          <h2 id="summary-heading" className="sr-only">Summary statistics</h2>
           {summaryCards.map(({ label, value, icon: Icon }) => (
             <Card key={label} className="p-5">
               <CardHeader className="p-0 pb-3">
                 <div className="flex items-center justify-between text-slate-200">
                   <span className="text-sm uppercase tracking-[0.18em]">{label}</span>
-                  <Icon className="text-brand-400" size={18} />
+                  <Icon className="text-brand-400" size={18} aria-hidden="true" />
                 </div>
               </CardHeader>
               <CardContent className="p-0">
-                <p className="text-3xl font-semibold text-white">{value}</p>
+                <p className="text-3xl font-semibold text-white" aria-label={`${label}: ${value}`}>{value}</p>
               </CardContent>
             </Card>
           ))}
         </section>
 
-        <section className="mt-8 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+        <section className="mt-8 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]" aria-labelledby="projects-heading">
+          <h2 id="projects-heading" className="sr-only">Project sections</h2>
           <Card className="p-6">
             <CardHeader className="p-0 pb-4"><CardTitle>Recent scan history</CardTitle></CardHeader>
             <CardContent className="p-0 space-y-4">
@@ -221,8 +230,8 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge>{scan.confidenceScore ? `${Math.round(scan.confidenceScore * 100)}% confidence` : 'Awaiting AI'}</Badge>
-                      <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => deleteScan(scan.id)} title="Delete scan">
-                        <Trash2 size={16} />
+                      <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => deleteScan(scan.id)} aria-label="Delete scan">
+                        <Trash2 size={16} aria-hidden="true" />
                       </Button>
                     </div>
                   </div>
@@ -248,13 +257,13 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge className="border-slate-500/30 bg-slate-500/10 text-slate-300">Saved</Badge>
-                      <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => deleteProject(project.id)} title="Delete project">
-                        <Trash2 size={16} />
+                      <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => deleteProject(project.id)} aria-label="Delete project">
+                        <Trash2 size={16} aria-hidden="true" />
                       </Button>
                     </div>
                   </div>
                   <p className="mt-3 text-sm text-slate-200/90">Linked scan: {project.scanId}</p>
-                  <Button variant="outline" className="mt-4" asChild><Link href={`/dashboard/project/${project.id}`}>Start project</Link></Button>
+                  <Button variant="outline" className="mt-4" onClick={() => router.push(`/dashboard/project/${project.id}`)}>Start project</Button>
                 </article>
               )) : <p className="text-slate-300">No available projects.</p>}
             </CardContent>
@@ -272,13 +281,13 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge className="border-brand-500/30 bg-brand-500/10 text-brand-100">In progress</Badge>
-                      <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => deleteProject(project.id)} title="Delete project">
-                        <Trash2 size={16} />
+                      <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => deleteProject(project.id)} aria-label="Delete project">
+                        <Trash2 size={16} aria-hidden="true" />
                       </Button>
                     </div>
                   </div>
                   <p className="mt-3 text-sm text-slate-200/90">Linked scan: {project.scanId}</p>
-                  <Button variant="outline" className="mt-4" asChild><Link href={`/dashboard/project/${project.id}`}>Continue project</Link></Button>
+                  <Button variant="outline" className="mt-4" onClick={() => router.push(`/dashboard/project/${project.id}`)}>Continue project</Button>
                 </article>
               )) : <p className="text-slate-300">No active projects.</p>}
             </CardContent>
@@ -296,29 +305,32 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge className="border-green-500/30 bg-green-500/10 text-green-300">Completed</Badge>
-                      <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => deleteProject(project.id)} title="Delete project">
-                        <Trash2 size={16} />
+                      <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => deleteProject(project.id)} aria-label="Delete project">
+                        <Trash2 size={16} aria-hidden="true" />
                       </Button>
                     </div>
                   </div>
                   <p className="mt-3 text-sm text-slate-200/90">Linked scan: {project.scanId}</p>
-                  <Button variant="outline" className="mt-4" asChild><Link href={`/dashboard/project/${project.id}`}>View details</Link></Button>
+                  <Button variant="outline" className="mt-4" onClick={() => router.push(`/dashboard/project/${project.id}`)}>View details</Button>
                 </article>
               )) : <p className="text-slate-300">No completed projects yet.</p>}
             </CardContent>
           </Card>
         </section>
 
-        <Card className="mt-8 p-6">
-          <CardHeader className="p-0 pb-4">
-            <CardTitle>How this works</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0 grid gap-4 text-sm text-slate-200 md:grid-cols-3">
-            <article className="rounded-3xl border border-white/10 bg-white/5 p-4">1. Capture an image, upload it to Firebase Storage, and queue the analysis.</article>
-            <article className="rounded-3xl border border-white/10 bg-white/5 p-4">2. OpenRouter returns a structured JSON blueprint with repair steps and expected CO₂ savings.</article>
-            <article className="rounded-3xl border border-white/10 bg-white/5 p-4">3. Save projects in Firestore and monitor progress from one clean dashboard.</article>
-          </CardContent>
-        </Card>
+        <section className="mt-8" aria-labelledby="how-it-works-heading">
+          <h2 id="how-it-works-heading" className="sr-only">How this works</h2>
+          <Card className="p-6">
+            <CardHeader className="p-0 pb-4">
+              <CardTitle>How this works</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0 grid gap-4 text-sm text-slate-200 md:grid-cols-3">
+              <article className="rounded-3xl border border-white/10 bg-white/5 p-4">1. Capture an image, upload it to Firebase Storage, and queue the analysis.</article>
+              <article className="rounded-3xl border border-white/10 bg-white/5 p-4">2. OpenRouter returns a structured JSON blueprint with repair steps and expected CO₂ savings.</article>
+              <article className="rounded-3xl border border-white/10 bg-white/5 p-4">3. Save projects in Firestore and monitor progress from one clean dashboard.</article>
+            </CardContent>
+          </Card>
+        </section>
       </section>
     </main>
   );
