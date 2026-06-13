@@ -1,5 +1,6 @@
 import './globals.css';
 import type { Metadata } from 'next';
+import { Providers } from '@/components/Providers';
 
 export const metadata: Metadata = {
   title: 'EcoLoop Upcycling Engine',
@@ -16,7 +17,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Skip to main content
         </a>
-        <div id="app-root">{children}</div>
+        <Providers>
+          <div id="app-root">{children}</div>
+        </Providers>
       </body>
     </html>
   );

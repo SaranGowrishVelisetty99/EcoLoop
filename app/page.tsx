@@ -57,7 +57,7 @@ export default function Home() {
                     <p className="text-xs uppercase tracking-[0.18em] text-slate-400">{label}</p>
                     <p className="text-xl font-semibold text-white">{value}</p>
                   </div>
-                  <Icon className="text-brand-400" size={22} />
+                  <Icon className="text-brand-400" size={22} aria-hidden="true" />
                 </div>
               ))}
             </div>

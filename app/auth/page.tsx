@@ -160,7 +160,7 @@ export default function AuthPage() {
                   id={errorId}
                   className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-100"
                   role="alert"
-                  aria-live="polite"
+                  aria-live="assertive"
                 >
                   {passwordMismatch ? 'Passwords do not match' : error}
                 </p>

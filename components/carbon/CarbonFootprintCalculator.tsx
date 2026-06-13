@@ -22,6 +22,7 @@ export function CarbonFootprintCalculator({ initialResult, onSave, readOnly = fa
   const [result, setResult] = useState<CarbonFootprintResult | null>(initialResult ?? null);
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [announcement, setAnnouncement] = useState<string>('');
 
   useEffect(() => {
     if (initialResult) {
@@ -41,6 +42,7 @@ export function CarbonFootprintCalculator({ initialResult, onSave, readOnly = fa
     const calculated = calculateCarbonFootprint(input);
     setResult(calculated);
     setSaved(false);
+    setAnnouncement(`Carbon footprint calculated: ${calculated.totalKgCo2PerYear.toLocaleString()} kg CO₂ per year`);
   }, [input]);
 
   const handleSave = useCallback(async () => {
@@ -49,6 +51,7 @@ export function CarbonFootprintCalculator({ initialResult, onSave, readOnly = fa
     try {
       await onSave(result);
       setSaved(true);
+      setAnnouncement('Carbon footprint saved to profile');
     } finally {
       setLoading(false);
     }
@@ -57,6 +60,7 @@ export function CarbonFootprintCalculator({ initialResult, onSave, readOnly = fa
   if (!result) {
     return (
       <Card className="p-6">
+        <div aria-live="polite" aria-atomic="true" className="sr-only" role="status">{announcement}</div>
         <CardHeader className="p-0 pb-4">
           <CardTitle className="flex items-center gap-2">
             <Calculator className="text-brand-400" size={24} />
@@ -70,10 +74,10 @@ export function CarbonFootprintCalculator({ initialResult, onSave, readOnly = fa
           <ConsumptionSection values={input.consumption} onChange={(f, v) => handleChange('consumption', f, v)} />
           
           <div className="flex gap-3 pt-4">
-            <Button onClick={handleCalculate} className="flex-1" disabled={loading}>
+            <Button onClick={handleCalculate} className="flex-1" disabled={loading} aria-busy={loading}>
               {loading ? (
                 <>
-                  <Loader2 className="mr-2 animate-spin" size={16} />
+                  <Loader2 className="mr-2 animate-spin" size={16} aria-hidden="true" />
                   Calculating...
                 </>
               ) : (
@@ -90,6 +94,7 @@ export function CarbonFootprintCalculator({ initialResult, onSave, readOnly = fa
 
   return (
     <div className="space-y-6">
+      <div aria-live="polite" aria-atomic="true" className="sr-only" role="status">{announcement}</div>
       <Card className="p-6">
         <CardHeader className="p-0 pb-4">
           <CardTitle className="flex items-center gap-2">
@@ -142,10 +147,10 @@ export function CarbonFootprintCalculator({ initialResult, onSave, readOnly = fa
           </div>
 
           <div className="flex gap-3 pt-4">
-            <Button onClick={handleCalculate} disabled={loading}>
+            <Button onClick={handleCalculate} disabled={loading} aria-busy={loading}>
               {loading ? (
                 <>
-                  <Loader2 className="mr-2 animate-spin" size={16} />
+                  <Loader2 className="mr-2 animate-spin" size={16} aria-hidden="true" />
                   Recalculate
                 </>
               ) : (
@@ -153,20 +158,20 @@ export function CarbonFootprintCalculator({ initialResult, onSave, readOnly = fa
               )}
             </Button>
             {onSave && !readOnly && (
-              <Button variant="outline" onClick={handleSave} disabled={loading || saved}>
+              <Button variant="outline" onClick={handleSave} disabled={loading || saved} aria-busy={loading}>
                 {saved ? (
                   <>
-                    <Save className="mr-2" size={16} />
+                    <Save className="mr-2" size={16} aria-hidden="true" />
                     Saved
                   </>
                 ) : loading ? (
                   <>
-                    <Loader2 className="mr-2 animate-spin" size={16} />
+                    <Loader2 className="mr-2 animate-spin" size={16} aria-hidden="true" />
                     Saving...
                   </>
                 ) : (
                   <>
-                    <Save className="mr-2" size={16} />
+                    <Save className="mr-2" size={16} aria-hidden="true" />
                     Save to Profile
                   </>
                 )}

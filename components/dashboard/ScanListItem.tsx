@@ -25,7 +25,7 @@ export const ScanListItem = memo(function ScanListItem({ scan, onDelete }: ScanL
         </div>
         <div className="flex items-center gap-2">
           <BadgeUI>{scan.confidenceScore ? `${Math.round(scan.confidenceScore * 100)}% confidence` : 'Awaiting AI'}</BadgeUI>
-          <ButtonUI variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={handleDelete} aria-label="Delete scan">
+          <ButtonUI variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={handleDelete} aria-label={`Delete scan: ${scan.detectedObject || 'Item under analysis'}`}>
             <Trash2 size={16} aria-hidden="true" />
           </ButtonUI>
         </div>

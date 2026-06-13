@@ -55,7 +55,7 @@ export function CarbonFootprintCharts({ result, history = [] }: CarbonFootprintC
             <CardTitle>Footprint Breakdown</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="flex h-64">
+            <div className="flex h-64" aria-hidden="true">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -86,7 +86,7 @@ export function CarbonFootprintCharts({ result, history = [] }: CarbonFootprintC
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <div className="mt-4 flex flex-wrap justify-center gap-4">
+            <div className="mt-4 flex flex-wrap justify-center gap-4" aria-hidden="true">
               {pieData.map((entry) => (
                 <div key={entry.category} className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
@@ -122,7 +122,7 @@ export function CarbonFootprintCharts({ result, history = [] }: CarbonFootprintC
             <CardTitle>vs. Household Average</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="flex h-64">
+            <div className="flex h-64" aria-hidden="true">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={barData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
@@ -180,7 +180,7 @@ export function CarbonFootprintCharts({ result, history = [] }: CarbonFootprintC
           <CardTitle>Footprint Trend (6 months)</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="flex h-64">
+          <div className="flex h-64" aria-hidden="true">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={trendData}>
                 <defs>
@@ -227,7 +227,7 @@ export function CarbonFootprintCharts({ result, history = [] }: CarbonFootprintC
               </AreaChart>
             </ResponsiveContainer>
           </div>
-          <div className="mt-4 flex flex-wrap justify-center gap-4 text-sm">
+          <div className="mt-4 flex flex-wrap justify-center gap-4 text-sm" aria-hidden="true">
             {Object.keys(result.breakdown).map((category, index) => (
               <span key={category} className="flex items-center gap-1" style={{ color: COLORS[index % COLORS.length] }}>
                 <span className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />

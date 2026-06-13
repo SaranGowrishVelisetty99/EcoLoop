@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
+import { getUidFromAuthHeader } from '@/lib/auth-verify';
 
 function ensureAdminDb() {
   if (!adminDb) {
@@ -14,18 +15,18 @@ export async function DELETE(
 ) {
   try {
     const { id: goalId } = await params;
-    const userId = request.nextUrl.searchParams.get('userId');
     
-    console.log('[API carbon-goals DELETE] goalId:', goalId, 'userId:', userId);
-    
-    if (!userId || typeof userId !== 'string' || userId.trim() === '') {
-      return NextResponse.json({ error: 'Invalid userId: must be a non-empty string' }, { status: 400 });
+    let uid: string;
+    try {
+      uid = await getUidFromAuthHeader(request.headers.get('authorization'));
+    } catch {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const db = ensureAdminDb();
     
     // Verify user document exists
-    const userRef = db.collection('users').doc(userId);
+    const userRef = db.collection('users').doc(uid);
     const userDoc = await userRef.get();
     if (!userDoc.exists) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -40,7 +41,7 @@ export async function DELETE(
 
     // Verify goal belongs to the user
     const goalData = goalDoc.data();
-    if (goalData?.userId !== userId) {
+    if (goalData?.userId !== uid) {
       return NextResponse.json({ error: 'Forbidden: goal does not belong to user' }, { status: 403 });
     }
 

@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const db = ensureAdminDb();
 
@@ -11,7 +11,8 @@ export async function GET() {
     const leaderboard = snapshot.docs
       .map((doc: any) => ({
         uid: doc.id,
-        ...doc.data(),
+        username: doc.data().username || `User ${doc.id.slice(0, 8)}`,
+        points: doc.data().points || 0,
       }))
       .sort((a: any, b: any) => (b.points || 0) - (a.points || 0))
       .slice(0, 50);

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb, adminFieldValue } from '@/lib/firebase-admin';
+import { getUidFromAuthHeader } from '@/lib/auth-verify';
 
 export const maxDuration = 60;
 
@@ -31,22 +32,6 @@ async function awardPoints(uid: string, email: string | undefined, points: numbe
   });
 }
 
-function decodeJwtPayload(token: string) {
-  try {
-    const parts = token.split('.');
-    if (parts.length !== 3) return null;
-    
-    // Convert Base64Url to standard Base64
-    let base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-    while (base64.length % 4) base64 += '=';
-    
-    const payload = JSON.parse(Buffer.from(base64, 'base64').toString('utf8'));
-    return { ...payload, uid: payload.uid || payload.user_id || payload.sub };
-  } catch {
-    return null;
-  }
-}
-
 function extractJson(content: string) {
   try {
     const jsonMatch = content.match(/\{[\s\S]*\}/);
@@ -60,10 +45,10 @@ function extractJson(content: string) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const token = request.headers.get('authorization')?.replace(/^Bearer /i, '') || '';
-    const decoded = token ? decodeJwtPayload(token) : null;
-
-    if (!token || !decoded?.uid) {
+    let uid: string;
+    try {
+      uid = await getUidFromAuthHeader(request.headers.get('authorization'));
+    } catch {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -86,6 +71,11 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Scan not found' }, { status: 404 });
       }
 
+      const scanData = scanDoc.data();
+      if (scanData?.userId !== uid) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+
       await scanDocRef.update({
         detectedObject: result.detectedObject,
         materialType: result.materialType,
@@ -101,7 +91,7 @@ export async function POST(request: NextRequest) {
       const db = ensureAdminDb();
       const scansCollection = db.collection('scans');
       const scanDocRef = await scansCollection.add({
-        userId: decoded.uid,
+        userId: uid,
         imageUrl: imageUrl || null,
         detectedObject: result.detectedObject,
         materialType: result.materialType,
@@ -114,7 +104,7 @@ export async function POST(request: NextRequest) {
 
       finalScanId = scanDocRef.id;
 
-      await awardPoints(decoded.uid, decoded.email, 25);
+      await awardPoints(uid, undefined, 25);
     }
 
     // Optimized parallel project creation and robust suggestion handling
@@ -124,7 +114,7 @@ export async function POST(request: NextRequest) {
       await Promise.all(
         result.suggestions.map((suggestion: { id?: string }, index: number) =>
           projectsCollection.add({
-            userId: decoded.uid,
+            userId: uid,
             scanId: finalScanId,
             suggestionId: suggestion.id || `sug_${finalScanId}_${index}`,
             status: 'saved',

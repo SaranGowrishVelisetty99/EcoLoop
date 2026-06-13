@@ -29,6 +29,7 @@ export function TransportSection({ values, onChange }: TransportSectionProps) {
             onChange={(e) => onChange('carKmPerWeek', parseFloat(e.target.value) || 0)}
             className="bg-slate-900/50 border-white/10"
             aria-describedby="carKmHint"
+            aria-label="Weekly kilometers driven by car"
           />
           <p id="carKmHint" className="text-xs text-slate-500">Daily commute + errands</p>
         </div>
@@ -40,12 +41,14 @@ export function TransportSection({ values, onChange }: TransportSectionProps) {
             value={values.carFuelType}
             onChange={(e) => onChange('carFuelType', e.target.value as CarbonFootprintInput['transport']['carFuelType'])}
             className="w-full rounded-2xl border border-white/10 bg-slate-900/50 px-4 py-2 text-slate-100 focus:ring-2 focus:ring-brand-500"
+            aria-describedby="carFuelType-hint"
           >
             <option value="petrol">Petrol</option>
             <option value="diesel">Diesel</option>
             <option value="hybrid">Hybrid</option>
             <option value="electric">Electric</option>
           </select>
+          <p id="carFuelType-hint" className="text-xs text-slate-500">Select your vehicle's fuel type</p>
         </div>
 
         <div className="space-y-2">
@@ -60,6 +63,7 @@ export function TransportSection({ values, onChange }: TransportSectionProps) {
             value={values.publicTransportKmPerWeek}
             onChange={(e) => onChange('publicTransportKmPerWeek', parseFloat(e.target.value) || 0)}
             className="bg-slate-900/50 border-white/10"
+            aria-label="Weekly kilometers traveled by public transport"
           />
         </div>
 
@@ -75,6 +79,7 @@ export function TransportSection({ values, onChange }: TransportSectionProps) {
             value={values.flightsPerYear}
             onChange={(e) => onChange('flightsPerYear', parseFloat(e.target.value) || 0)}
             className="bg-slate-900/50 border-white/10"
+            aria-label="Number of flights per year"
           />
         </div>
 
@@ -85,11 +90,13 @@ export function TransportSection({ values, onChange }: TransportSectionProps) {
             value={values.flightDistance}
             onChange={(e) => onChange('flightDistance', e.target.value as CarbonFootprintInput['transport']['flightDistance'])}
             className="w-full rounded-2xl border border-white/10 bg-slate-900/50 px-4 py-2 text-slate-100 focus:ring-2 focus:ring-brand-500"
+            aria-describedby="flightDistance-hint"
           >
             <option value="short">Short (&lt; 800 km)</option>
             <option value="medium">Medium (800-3000 km)</option>
             <option value="long">Long (&gt; 3000 km)</option>
           </select>
+          <p id="flightDistance-hint" className="text-xs text-slate-500">Select typical flight distance category</p>
         </div>
       </div>
     </div>

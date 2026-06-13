@@ -56,11 +56,13 @@ export function ConsumptionSection({ values, onChange }: ConsumptionSectionProps
             value={values.recyclingRate}
             onChange={(e) => onChange('recyclingRate', e.target.value as CarbonFootprintInput['consumption']['recyclingRate'])}
             className="w-full rounded-2xl border border-white/10 bg-slate-900/50 px-4 py-2 text-slate-100 focus:ring-2 focus:ring-brand-500"
+            aria-describedby="recyclingRate-hint"
           >
             <option value="high">High (recycle most)</option>
             <option value="average">Average (recycle some)</option>
             <option value="low">Low (rarely recycle)</option>
           </select>
+          <p id="recyclingRate-hint" className="text-xs text-slate-500">Select how much you typically recycle</p>
         </div>
 
         <div className="space-y-2">
@@ -76,9 +78,11 @@ export function ConsumptionSection({ values, onChange }: ConsumptionSectionProps
             value={values.secondHandPercentage}
             onChange={(e) => onChange('secondHandPercentage', parseFloat(e.target.value) || 0)}
             className="w-full accent-brand-500"
-            aria-valuetext={`${values.secondHandPercentage}%`}
+            aria-valuetext={`${values.secondHandPercentage}% second-hand purchases`}
+            aria-label="Percentage of second-hand purchases"
           />
-          <p className="text-sm text-slate-400">{values.secondHandPercentage}%</p>
+          <p className="text-sm text-slate-400" aria-hidden="true">{values.secondHandPercentage}%</p>
+          <output htmlFor="secondHandPercentage" className="sr-only">{values.secondHandPercentage}% second-hand purchases</output>
         </div>
       </div>
     </div>

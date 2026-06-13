@@ -26,6 +26,7 @@ export function DietSection({ values, onChange }: DietSectionProps) {
             value={values.dietType}
             onChange={(e) => onChange('dietType', e.target.value as CarbonFootprintInput['diet']['dietType'])}
             className="w-full rounded-2xl border border-white/10 bg-slate-900/50 px-4 py-2 text-slate-100 focus:ring-2 focus:ring-brand-500"
+            aria-describedby="dietType-hint"
           >
             <option value="meat-heavy">Meat-heavy (daily red meat)</option>
             <option value="average">Average (meat most days)</option>
@@ -33,6 +34,7 @@ export function DietSection({ values, onChange }: DietSectionProps) {
             <option value="vegetarian">Vegetarian</option>
             <option value="vegan">Vegan</option>
           </select>
+          <p id="dietType-hint" className="text-xs text-slate-500">Select your typical dietary pattern</p>
         </div>
 
         <div className="space-y-2">
@@ -42,11 +44,13 @@ export function DietSection({ values, onChange }: DietSectionProps) {
             value={values.foodWasteLevel}
             onChange={(e) => onChange('foodWasteLevel', e.target.value as CarbonFootprintInput['diet']['foodWasteLevel'])}
             className="w-full rounded-2xl border border-white/10 bg-slate-900/50 px-4 py-2 text-slate-100 focus:ring-2 focus:ring-brand-500"
+            aria-describedby="foodWasteLevel-hint"
           >
             <option value="high">High (throw away often)</option>
             <option value="average">Average (sometimes)</option>
             <option value="low">Low (rarely waste)</option>
           </select>
+          <p id="foodWasteLevel-hint" className="text-xs text-slate-500">Select how much food you typically waste</p>
         </div>
 
         <div className="space-y-2">
@@ -62,9 +66,11 @@ export function DietSection({ values, onChange }: DietSectionProps) {
             value={values.localFoodPercentage}
             onChange={(e) => onChange('localFoodPercentage', parseFloat(e.target.value) || 0)}
             className="w-full accent-brand-500"
-            aria-valuetext={`${values.localFoodPercentage}%`}
+            aria-valuetext={`${values.localFoodPercentage}% local or seasonal food`}
+            aria-label="Percentage of local or seasonal food in diet"
           />
-          <p className="text-sm text-slate-400">{values.localFoodPercentage}%</p>
+          <p className="text-sm text-slate-400" aria-hidden="true">{values.localFoodPercentage}%</p>
+          <output htmlFor="localFoodPercentage" className="sr-only">{values.localFoodPercentage}% local or seasonal food</output>
         </div>
       </div>
     </div>

@@ -41,8 +41,11 @@ button, input, textarea, select { font: inherit; }
   .bg-white\/5 { background-color: rgba(255,255,255,0.1) !important; }
   .text-slate-300 { color: #cbd5e1 !important; }
   .text-slate-400 { color: #94a3b8 !important; }
-  .text-slate-500 { color: #64748b !important; }
+  .text-slate-500 { color: #94a3b8 !important; }
 }
+
+.text-slate-400 { color: #94a3b8; }
+.text-slate-500 { color: #94a3b8; }
 
 .sr-only {
   position: absolute;
@@ -91,4 +94,9 @@ select:focus-visible {
   .animate-pulse {
     animation: none;
   }
+}
+
+#main-content:focus {
+  outline: 2px solid #22c55e;
+  outline-offset: 2px;
 }

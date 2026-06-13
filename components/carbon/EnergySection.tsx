@@ -31,6 +31,7 @@ export function EnergySection({ values, onChange }: EnergySectionProps) {
             value={values.electricityKwhPerMonth}
             onChange={(e) => onChange('electricityKwhPerMonth', parseFloat(e.target.value) || 0)}
             className="bg-slate-900/50 border-white/10"
+            aria-label="Monthly electricity usage in kilowatt-hours"
           />
         </div>
 
@@ -46,6 +47,7 @@ export function EnergySection({ values, onChange }: EnergySectionProps) {
             value={values.gasKwhPerMonth}
             onChange={(e) => onChange('gasKwhPerMonth', parseFloat(e.target.value) || 0)}
             className="bg-slate-900/50 border-white/10"
+            aria-label="Monthly gas or heating usage in kilowatt-hours"
           />
         </div>
 
@@ -56,6 +58,7 @@ export function EnergySection({ values, onChange }: EnergySectionProps) {
             value={values.heatingType}
             onChange={(e) => onChange('heatingType', e.target.value as CarbonFootprintInput['energy']['heatingType'])}
             className="w-full rounded-2xl border border-white/10 bg-slate-900/50 px-4 py-2 text-slate-100 focus:ring-2 focus:ring-brand-500"
+            aria-describedby="heatingType-hint"
           >
             <option value="gas">Gas boiler</option>
             <option value="electric">Electric heater</option>
@@ -63,6 +66,7 @@ export function EnergySection({ values, onChange }: EnergySectionProps) {
             <option value="oil">Oil boiler</option>
             <option value="district">District heating</option>
           </select>
+          <p id="heatingType-hint" className="text-xs text-slate-500">Select your home's heating system type</p>
         </div>
 
         <div className="space-y-2">
@@ -77,6 +81,7 @@ export function EnergySection({ values, onChange }: EnergySectionProps) {
             value={values.householdSize}
             onChange={(e) => onChange('householdSize', parseFloat(e.target.value) || 1)}
             className="bg-slate-900/50 border-white/10"
+            aria-label="Number of people in household"
           />
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb, adminFieldValue } from '@/lib/firebase-admin';
+import { getUidFromAuthHeader } from '@/lib/auth-verify';
 
 export async function DELETE(
   request: NextRequest,
@@ -8,14 +9,10 @@ export async function DELETE(
   try {
     const { id: scanId } = await params;
 
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const token = authHeader.replace(/^Bearer /i, '');
-    const decoded = decodeJwtPayload(token);
-    if (!decoded?.uid) {
+    let uid: string;
+    try {
+      uid = await getUidFromAuthHeader(request.headers.get('authorization'));
+    } catch {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -29,7 +26,7 @@ export async function DELETE(
     }
 
     const scanData = scanDoc.data();
-    if (scanData?.userId !== decoded.uid) {
+    if (scanData?.userId !== uid) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -58,19 +55,4 @@ function ensureAdminDb() {
     throw new Error('Firebase Admin not initialized. Set FIREBASE_ADMIN_SERVICE_ACCOUNT env var or run gcloud auth application-default login.');
   }
   return adminDb.get();
-}
-
-function decodeJwtPayload(token: string) {
-  try {
-    const parts = token.split('.');
-    if (parts.length !== 3) return null;
-
-    let base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-    while (base64.length % 4) base64 += '=';
-
-    const payload = JSON.parse(Buffer.from(base64, 'base64').toString('utf8'));
-    return { ...payload, uid: payload.uid || payload.user_id || payload.sub };
-  } catch {
-    return null;
-  }
 }

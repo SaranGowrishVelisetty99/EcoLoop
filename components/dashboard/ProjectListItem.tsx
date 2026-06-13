@@ -52,7 +52,7 @@ export const ProjectListItem = memo(function ProjectListItem({ project, status, 
         </div>
         <div className="flex items-center gap-2">
           <BadgeUI className={config.badgeClass}>{status}</BadgeUI>
-          <ButtonUI variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => onDelete(project.id)} aria-label="Delete project">
+          <ButtonUI variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => onDelete(project.id)} aria-label={`Delete project: ${project.suggestionTitle}`}>
             <Trash2 size={16} aria-hidden="true" />
           </ButtonUI>
         </div>

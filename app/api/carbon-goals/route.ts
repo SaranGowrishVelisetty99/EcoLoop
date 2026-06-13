@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb, adminFieldValue } from '@/lib/firebase-admin';
+import { getUidFromAuthHeader } from '@/lib/auth-verify';
 
 function ensureAdminDb() {
   if (!adminDb) {
@@ -10,20 +11,26 @@ function ensureAdminDb() {
 
 export async function GET(request: NextRequest) {
   try {
-    const userId = request.nextUrl.searchParams.get('userId');
-    if (!userId) {
-      return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
+    const authHeader = request.headers.get('authorization');
+    console.log('[API carbon-goals GET] Auth header present:', !!authHeader, 'length:', authHeader?.length);
+    
+    let uid: string;
+    try {
+      uid = await getUidFromAuthHeader(authHeader);
+    } catch (e) {
+      console.error('[API carbon-goals GET] Auth failed:', e);
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const db = ensureAdminDb();
-    const userRef = db.collection('users').doc(userId);
+    const userRef = db.collection('users').doc(uid);
     const goalsRef = userRef.collection('carbonGoals');
     
-    console.log('[API carbon-goals GET] userId:', userId, 'path:', goalsRef.path);
+    console.log('[API carbon-goals GET] userId:', uid, 'path:', goalsRef.path);
     
     const snapshot = await goalsRef.orderBy('createdAt', 'desc').get();
 
-    console.log('[API carbon-goals GET] userId:', userId, 'docs count:', snapshot.docs.length);
+    console.log('[API carbon-goals GET] userId:', uid, 'docs count:', snapshot.docs.length);
 
     const goals = snapshot.docs
       .map((doc: any) => ({
@@ -31,9 +38,7 @@ export async function GET(request: NextRequest) {
         ...doc.data(),
         createdAt: doc.data().createdAt?.toDate?.() || new Date(),
         targetDate: doc.data().targetDate?.toDate?.() || new Date(),
-      }))
-      // Filter out goals that don't belong to the current user (data integrity fix)
-      .filter((goal: any) => goal.userId === userId);
+      }));
 
     return NextResponse.json({ goals }, {
       headers: {
@@ -50,14 +55,18 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { userId, targetReductionPercentage, targetDate, baselineTotalKgCo2 } = body;
-
-    console.log('[API carbon-goals POST] userId:', userId, 'body:', body);
-
-    if (!userId || typeof userId !== 'string' || userId.trim() === '') {
-      return NextResponse.json({ error: 'Invalid userId: must be a non-empty string' }, { status: 400 });
+    let uid: string;
+    try {
+      uid = await getUidFromAuthHeader(request.headers.get('authorization'));
+    } catch {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const body = await request.json();
+    const { targetReductionPercentage, targetDate, baselineTotalKgCo2 } = body;
+
+    console.log('[API carbon-goals POST] userId:', uid, 'body:', body);
+
     if (!targetReductionPercentage || !targetDate || !baselineTotalKgCo2) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
@@ -65,18 +74,18 @@ export async function POST(request: NextRequest) {
     const db = ensureAdminDb();
     
     // Verify user document exists before creating subcollection
-    const userRef = db.collection('users').doc(userId);
+    const userRef = db.collection('users').doc(uid);
     const userDoc = await userRef.get();
     if (!userDoc.exists) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
- 
+  
     const goalsRef = userRef.collection('carbonGoals');
     
-    console.log('[API carbon-goals POST] userId:', userId, 'path:', goalsRef.path);
+    console.log('[API carbon-goals POST] userId:', uid, 'path:', goalsRef.path);
     
     const goalData = {
-      userId,
+      userId: uid,
       targetReductionPercentage,
       targetDate: new Date(targetDate),
       baselineTotalKgCo2,
