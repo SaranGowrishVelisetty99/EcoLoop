@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Calculator, Target, TrendingDown, Save, Loader2 } from 'lucide-react';
+import { Calculator, Save, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { TransportSection } from './TransportSection';
 import { EnergySection } from './EnergySection';
 import { DietSection } from './DietSection';

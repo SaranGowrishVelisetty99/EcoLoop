@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
-import Link from 'next/link';
 import { ArrowLeft, Camera, Loader2, Sparkles } from 'lucide-react';
 import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';

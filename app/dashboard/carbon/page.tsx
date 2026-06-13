@@ -2,12 +2,11 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, Suspense, lazy } from 'react';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { collection, onSnapshot, query, where, doc, addDoc, serverTimestamp, orderBy, limit } from 'firebase/firestore';
-import { Leaf, Recycle, Sparkles, TimerReset, FolderOpen, CheckCircle, Award, Trash2, Trophy, User, Calculator, Target, ArrowLeft, type LucideIcon } from 'lucide-react';
+import { onAuthStateChanged } from 'firebase/auth';
+import { collection, onSnapshot, query, addDoc, serverTimestamp, orderBy, limit } from 'firebase/firestore';
+import { Leaf, ArrowLeft, type LucideIcon } from 'lucide-react';
 import { auth, db } from '@/lib/firebase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CarbonFootprintCalculator } from '@/components/carbon/CarbonFootprintCalculator';
 import { CarbonFootprintCharts } from '@/components/carbon/CarbonFootprintCharts';
@@ -50,10 +49,9 @@ function GoalsFallback() {
 export default function CarbonFootprintPage() {
   const router = useRouter();
   const [userId, setUserId] = useState<string | null>(null);
-  const [username, setUsername] = useState<string>('');
+  const [username] = useState<string>('');
   const [footprintResult, setFootprintResult] = useState<CarbonFootprintResult | null>(null);
   const [footprintHistory, setFootprintHistory] = useState<CarbonFootprintHistoryEntry[]>([]);
-  const [savingFootprint, setSavingFootprint] = useState(false);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
@@ -91,7 +89,6 @@ export default function CarbonFootprintPage() {
 
   const saveFootprint = async (result: CarbonFootprintResult) => {
     if (!userId) return;
-    setSavingFootprint(true);
     try {
       const footprintRef = collection(db, 'users', userId, 'carbonFootprint');
       await addDoc(footprintRef, {
@@ -102,8 +99,6 @@ export default function CarbonFootprintPage() {
       setFootprintResult(result);
     } catch (e) {
       console.error('Failed to save footprint:', e);
-    } finally {
-      setSavingFootprint(false);
     }
   };
 

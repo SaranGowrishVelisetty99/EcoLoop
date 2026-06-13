@@ -1,6 +1,6 @@
 'use client';
 
-import { Utensils, Leaf, Recycle } from 'lucide-react';
+import { Utensils, Leaf } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { CarbonFootprintInput } from '@/types';
 

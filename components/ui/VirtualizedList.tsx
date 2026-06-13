@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { List, ListProps } from 'react-window';
-import { memo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { List } from 'react-window';
 
 interface VirtualizedListProps<T> {
   items: T[];
@@ -35,10 +34,8 @@ export function VirtualizedList<T>({
   width = '100%',
   height = '400px',
   itemKey,
-  ...rest
 }: VirtualizedListProps<T>) {
   const [itemSize, setItemSize] = useState(itemHeight);
-  const [containerWidth, setContainerWidth] = useState(typeof width === 'string' ? width : `${width}px`);
   
   const getItemKey = useMemo(() => 
     itemKey || ((item: T, index: number) => String(index)), 
@@ -53,7 +50,7 @@ export function VirtualizedList<T>({
   }, [itemHeight]);
   
   return (
-    <div className={className} style={{ width: containerWidth, height }}>
+    <div className={className} style={{ width, height }}>
       <List
         // @ts-ignore - react-window types are incomplete
         height={typeof height === 'string' ? parseInt(height) : height}

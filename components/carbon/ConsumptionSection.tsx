@@ -1,6 +1,6 @@
 'use client';
 
-import { Shirt, Smartphone, Recycle, RotateCcw } from 'lucide-react';
+import { Shirt, Smartphone, RotateCcw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { CarbonFootprintInput } from '@/types';
 

@@ -1,15 +1,14 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { onAuthStateChanged, getIdToken } from 'firebase/auth';
 import { doc, onSnapshot, serverTimestamp, updateDoc } from 'firebase/firestore';
-import { Leaf, TimerReset } from 'lucide-react';
 import { auth, db } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Leaf, TimerReset } from 'lucide-react';
 
 interface ProjectDoc {
   id: string;

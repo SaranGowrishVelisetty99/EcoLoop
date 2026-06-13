@@ -1,6 +1,6 @@
 'use client';
 
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area } from 'recharts';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { CarbonFootprintResult, CarbonFootprintHistoryEntry } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -70,8 +70,8 @@ export function CarbonFootprintCharts({ result, history = [] }: CarbonFootprintC
                     label={({ name, percent }) => `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`}
                     labelLine={false}
                   >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    {pieData.map((entry, _index) => (
+                      <Cell key={`cell-${_index}`} fill={entry.color} />
                     ))}
                   </Pie>
                   <Tooltip
@@ -87,7 +87,7 @@ export function CarbonFootprintCharts({ result, history = [] }: CarbonFootprintC
               </ResponsiveContainer>
             </div>
             <div className="mt-4 flex flex-wrap justify-center gap-4">
-              {pieData.map((entry, index) => (
+              {pieData.map((entry) => (
                 <div key={entry.category} className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
                   <span className="text-sm text-slate-300">{entry.name}: {entry.value.toLocaleString()} kg</span>
@@ -184,10 +184,10 @@ export function CarbonFootprintCharts({ result, history = [] }: CarbonFootprintC
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={trendData}>
                 <defs>
-                  {Object.keys(result.breakdown).map((category, index) => (
+                  {Object.keys(result.breakdown).map((category, _index) => (
                     <linearGradient key={category} id={`color-${category}`} x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={COLORS[index % COLORS.length]} stopOpacity={0.3} />
-                      <stop offset="95%" stopColor={COLORS[index % COLORS.length]} stopOpacity={0} />
+                      <stop offset="5%" stopColor={COLORS[_index % COLORS.length]} stopOpacity={0.3} />
+                      <stop offset="95%" stopColor={COLORS[_index % COLORS.length]} stopOpacity={0} />
                     </linearGradient>
                   ))}
                 </defs>
@@ -206,12 +206,12 @@ export function CarbonFootprintCharts({ result, history = [] }: CarbonFootprintC
                     borderRadius: '12px',
                   }}
                 />
-                {Object.keys(result.breakdown).map((category, index) => (
+                {Object.keys(result.breakdown).map((category, _index) => (
                   <Area
                     key={category}
                     type="monotone"
                     dataKey={category}
-                    stroke={COLORS[index % COLORS.length]}
+                    stroke={COLORS[_index % COLORS.length]}
                     fill={`url(#color-${category})`}
                     strokeWidth={2}
                   />

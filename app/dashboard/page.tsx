@@ -1,11 +1,10 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, onSnapshot, query, where, doc } from 'firebase/firestore';
-import { Leaf, Recycle, Sparkles, TimerReset, FolderOpen, CheckCircle, Award, Trophy, User, Calculator, type LucideIcon } from 'lucide-react';
+import { Leaf, Recycle, Sparkles, FolderOpen, CheckCircle, Award, Trophy, User, Calculator, type LucideIcon } from 'lucide-react';
 import { auth, db } from '@/lib/firebase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
