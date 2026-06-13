@@ -5,11 +5,12 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, onSnapshot, query, where, doc } from 'firebase/firestore';
-import { Leaf, Recycle, Sparkles, TimerReset, FolderOpen, CheckCircle, Award, Trash2, Trophy, User, Calculator, type LucideIcon } from 'lucide-react';
+import { Leaf, Recycle, Sparkles, TimerReset, FolderOpen, CheckCircle, Award, Trophy, User, Calculator, type LucideIcon } from 'lucide-react';
 import { auth, db } from '@/lib/firebase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { ScanListItem } from '@/components/dashboard/ScanListItem';
+import { ProjectListItem } from '@/components/dashboard/ProjectListItem';
 
 interface ScanDoc {
   id: string;
@@ -218,29 +219,11 @@ export default function DashboardPage() {
 
         <section className="mt-8 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]" aria-labelledby="projects-heading">
           <h2 id="projects-heading" className="sr-only">Project sections</h2>
-          <Card className="p-6">
+            <Card className="p-6">
             <CardHeader className="p-0 pb-4"><CardTitle>Recent scan history</CardTitle></CardHeader>
             <CardContent className="p-0 space-y-4">
               {scans.length ? scans.slice(0, 6).map((scan) => (
-                <article key={scan.id} className="rounded-3xl border border-white/10 bg-slate-950/70 p-4">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <p className="text-lg font-semibold text-white">{scan.detectedObject || 'Item under analysis'}</p>
-                      <p className="text-sm text-slate-300">{scan.materialType || 'Material type pending'} · {scan.conditionAssessment || 'Analysis in progress'}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge>{scan.confidenceScore ? `${Math.round(scan.confidenceScore * 100)}% confidence` : 'Awaiting AI'}</Badge>
-                      <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => deleteScan(scan.id)} aria-label="Delete scan">
-                        <Trash2 size={16} aria-hidden="true" />
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {(scan.suggestions ?? []).slice(0, 2).map((suggestion) => (
-                      <span key={`${scan.id}-${suggestion.title}`} className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-200">{suggestion.title}</span>
-                    ))}
-                  </div>
-                </article>
+                <ScanListItem key={scan.id} scan={scan} onDelete={deleteScan} />
               )) : <p className="text-slate-300">No scan records yet. Start a scan to generate your first upcycling blueprint.</p>}
             </CardContent>
           </Card>
@@ -249,22 +232,7 @@ export default function DashboardPage() {
             <CardHeader className="p-0 pb-4"><CardTitle>Available Projects</CardTitle></CardHeader>
             <CardContent className="p-0 space-y-4">
               {availableProjects.length ? availableProjects.map((project) => (
-                <article key={project.id} className="rounded-3xl border border-white/10 bg-slate-950/70 p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-lg font-semibold text-white">{project.suggestionTitle}</p>
-                      <p className="text-sm text-slate-300">Ready to start</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge className="border-slate-500/30 bg-slate-500/10 text-slate-300">Saved</Badge>
-                      <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => deleteProject(project.id)} aria-label="Delete project">
-                        <Trash2 size={16} aria-hidden="true" />
-                      </Button>
-                    </div>
-                  </div>
-                  <p className="mt-3 text-sm text-slate-200/90">Linked scan: {project.scanId}</p>
-                  <Button variant="outline" className="mt-4" onClick={() => router.push(`/dashboard/project/${project.id}`)}>Start project</Button>
-                </article>
+                <ProjectListItem key={project.id} project={project} status="saved" onDelete={deleteProject} />
               )) : <p className="text-slate-300">No available projects.</p>}
             </CardContent>
           </Card>
@@ -273,22 +241,7 @@ export default function DashboardPage() {
             <CardHeader className="p-0 pb-4"><CardTitle>Active Projects</CardTitle></CardHeader>
             <CardContent className="p-0 space-y-4">
               {activeProjects.length ? activeProjects.map((project) => (
-                <article key={project.id} className="rounded-3xl border border-white/10 bg-slate-950/70 p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-lg font-semibold text-white">{project.suggestionTitle}</p>
-                      <p className="text-sm text-slate-300">In progress</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge className="border-brand-500/30 bg-brand-500/10 text-brand-100">In progress</Badge>
-                      <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => deleteProject(project.id)} aria-label="Delete project">
-                        <Trash2 size={16} aria-hidden="true" />
-                      </Button>
-                    </div>
-                  </div>
-                  <p className="mt-3 text-sm text-slate-200/90">Linked scan: {project.scanId}</p>
-                  <Button variant="outline" className="mt-4" onClick={() => router.push(`/dashboard/project/${project.id}`)}>Continue project</Button>
-                </article>
+                <ProjectListItem key={project.id} project={project} status="in_progress" onDelete={deleteProject} />
               )) : <p className="text-slate-300">No active projects.</p>}
             </CardContent>
           </Card>
@@ -297,22 +250,7 @@ export default function DashboardPage() {
             <CardHeader className="p-0 pb-4"><CardTitle>Completed Projects</CardTitle></CardHeader>
             <CardContent className="p-0 space-y-4">
               {completedProjects.length ? completedProjects.map((project) => (
-                <article key={project.id} className="rounded-3xl border border-white/10 bg-slate-950/70 p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-lg font-semibold text-white">{project.suggestionTitle}</p>
-                      <p className="text-sm text-slate-300">Completed</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge className="border-green-500/30 bg-green-500/10 text-green-300">Completed</Badge>
-                      <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300" onClick={() => deleteProject(project.id)} aria-label="Delete project">
-                        <Trash2 size={16} aria-hidden="true" />
-                      </Button>
-                    </div>
-                  </div>
-                  <p className="mt-3 text-sm text-slate-200/90">Linked scan: {project.scanId}</p>
-                  <Button variant="outline" className="mt-4" onClick={() => router.push(`/dashboard/project/${project.id}`)}>View details</Button>
-                </article>
+                <ProjectListItem key={project.id} project={project} status="completed" onDelete={deleteProject} />
               )) : <p className="text-slate-300">No completed projects yet.</p>}
             </CardContent>
           </Card>

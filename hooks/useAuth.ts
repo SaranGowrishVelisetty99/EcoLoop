@@ -1,11 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { User, onAuthStateChanged } from 'firebase/auth';
+import { createContext, useContext, useEffect, useState, ReactNode, createElement } from 'react';
+import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
-export function useAuth() {
-  const [user, setUser] = useState<User | null>(null);
+interface AuthContextType {
+  user: FirebaseUser | null;
+  loading: boolean;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<FirebaseUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,10 +23,14 @@ export function useAuth() {
     return () => unsub();
   }, []);
 
-  return { user, loading };
+  // Use createElement to avoid JSX namespace issues
+  return createElement(AuthContext.Provider, { value: { user, loading } }, children);
 }
 
-export function useRequireAuth() {
-  const { user, loading } = useAuth();
-  return { user, loading, isAuthenticated: !loading && !!user };
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 }

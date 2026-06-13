@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense, lazy } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, onSnapshot, query, where, doc, addDoc, serverTimestamp, orderBy, limit } from 'firebase/firestore';
 import { Leaf, Recycle, Sparkles, TimerReset, FolderOpen, CheckCircle, Award, Trash2, Trophy, User, Calculator, Target, ArrowLeft, type LucideIcon } from 'lucide-react';
@@ -13,6 +13,39 @@ import { CarbonFootprintCalculator } from '@/components/carbon/CarbonFootprintCa
 import { CarbonFootprintCharts } from '@/components/carbon/CarbonFootprintCharts';
 import { CarbonFootprintGoals } from '@/components/carbon/CarbonFootprintGoals';
 import { CarbonFootprintResult, CarbonFootprintHistoryEntry } from '@/types';
+
+// Lazy load heavy components
+const CarbonFootprintCalculatorLazy = lazy(() => import('@/components/carbon/CarbonFootprintCalculator').then(m => ({ default: m.CarbonFootprintCalculator })));
+const CarbonFootprintChartsLazy = lazy(() => import('@/components/carbon/CarbonFootprintCharts').then(m => ({ default: m.CarbonFootprintCharts })));
+const CarbonFootprintGoalsLazy = lazy(() => import('@/components/carbon/CarbonFootprintGoals').then(m => ({ default: m.CarbonFootprintGoals })));
+
+// Suspense fallback components
+function CalculatorFallback() {
+  return (
+    <div className="animate-pulse space-y-6">
+      <div className="h-64 bg-white/5 rounded-3xl" />
+      <div className="h-64 bg-white/5 rounded-3xl" />
+    </div>
+  );
+}
+
+function ChartsFallback() {
+  return (
+    <div className="animate-pulse space-y-6">
+      <div className="h-64 bg-white/5 rounded-3xl" />
+      <div className="h-64 bg-white/5 rounded-3xl" />
+    </div>
+  );
+}
+
+function GoalsFallback() {
+  return (
+    <div className="animate-pulse space-y-4">
+      <div className="h-4 bg-white/5 rounded w-3/4" />
+      <div className="h-20 bg-white/5 rounded" />
+    </div>
+  );
+}
 
 export default function CarbonFootprintPage() {
   const router = useRouter();
@@ -109,15 +142,21 @@ export default function CarbonFootprintPage() {
         <section className="mt-8" aria-labelledby="calculator-heading">
           <h2 id="calculator-heading" className="sr-only">Carbon Footprint Calculator</h2>
           <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
-            <CarbonFootprintCalculator initialResult={footprintResult} onSave={saveFootprint} />
-            <CarbonFootprintCharts result={footprintResult} history={footprintHistory} />
+            <Suspense fallback={<CalculatorFallback />}>
+              <CarbonFootprintCalculatorLazy initialResult={footprintResult} onSave={saveFootprint} />
+            </Suspense>
+            <Suspense fallback={<ChartsFallback />}>
+              <CarbonFootprintChartsLazy result={footprintResult} history={footprintHistory} />
+            </Suspense>
           </div>
         </section>
 
         {userId && (
           <section className="mt-8" aria-labelledby="goals-heading">
             <h2 id="goals-heading" className="sr-only">Carbon Reduction Goals</h2>
-            <CarbonFootprintGoals currentFootprint={footprintResult} userId={userId} />
+            <Suspense fallback={<GoalsFallback />}>
+              <CarbonFootprintGoalsLazy currentFootprint={footprintResult} userId={userId} />
+            </Suspense>
           </section>
         )}
 
