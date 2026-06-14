@@ -4,13 +4,10 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState, Suspense, lazy } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { collection, onSnapshot, query, addDoc, serverTimestamp, orderBy, limit } from 'firebase/firestore';
-import { Leaf, ArrowLeft, type LucideIcon } from 'lucide-react';
+import { Leaf, ArrowLeft } from 'lucide-react';
 import { auth, db } from '@/lib/firebase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CarbonFootprintCalculator } from '@/components/carbon/CarbonFootprintCalculator';
-import { CarbonFootprintCharts } from '@/components/carbon/CarbonFootprintCharts';
-import { CarbonFootprintGoals } from '@/components/carbon/CarbonFootprintGoals';
 import { CarbonFootprintResult, CarbonFootprintHistoryEntry } from '@/types';
 
 // Lazy load heavy components

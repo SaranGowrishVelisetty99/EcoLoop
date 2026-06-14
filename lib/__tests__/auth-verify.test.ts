@@ -1,13 +1,16 @@
 import { verifyIdToken, getUidFromAuthHeader } from '../auth-verify';
+import { getAdminAuth } from '@/lib/firebase-admin';
 
 jest.mock('@/lib/firebase-admin', () => ({
   getAdminAuth: jest.fn(),
 }));
 
-const { getAdminAuth } = require('@/lib/firebase-admin');
+interface MockAuth {
+  verifyIdToken: jest.Mock;
+}
 
 describe('auth-verify', () => {
-  let mockAuth: any;
+  let mockAuth: MockAuth;
 
   beforeEach(() => {
     jest.clearAllMocks();

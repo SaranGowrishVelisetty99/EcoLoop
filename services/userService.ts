@@ -30,7 +30,7 @@ export function createUserService(db = adminDb, fieldValue = adminFieldValue): U
 
     async awardPoints(uid: string, points: number): Promise<number> {
       const userRef = usersCollection.doc(uid);
-      await db.runTransaction(async (transaction: any) => {
+      await db.runTransaction(async (transaction: FirebaseFirestore.Transaction) => {
         const userDoc = await transaction.get(userRef);
         const currentPoints = userDoc.exists ? (userDoc.data()?.points || 0) : 0;
         const newPoints = currentPoints + points;
@@ -42,7 +42,7 @@ export function createUserService(db = adminDb, fieldValue = adminFieldValue): U
     async getLeaderboard(limitCount = 50): Promise<UserDoc[]> {
       const query = usersCollection.orderBy('points', 'desc').limit(limitCount);
       const snapshot = await query.get();
-      return snapshot.docs.map((doc: any) => ({ uid: doc.id, ...doc.data() } as UserDoc));
+      return snapshot.docs.map((doc: FirebaseFirestore.QueryDocumentSnapshot) => ({ uid: doc.id, ...doc.data() } as UserDoc));
     },
   };
 }

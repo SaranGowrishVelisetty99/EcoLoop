@@ -26,9 +26,9 @@ describe('useFirestore hooks', () => {
 
   describe('useCollection', () => {
     it('should initialize with loading state and fetch data', async () => {
-      (firestore.onSnapshot as jest.Mock).mockImplementation((q, ...args: any[]) => {
+      (firestore.onSnapshot as jest.Mock).mockImplementation((q, ...args: unknown[]) => {
         const observer = args[0];
-        const next = typeof observer === 'function' ? observer : observer.next;
+        const next = typeof observer === 'function' ? observer : (observer as { next?: (snapshot: { docs: Array<{ id: string; data: () => { name: string } }> }) => void }).next;
         if (next) next({ docs: mockDocs });
         return () => {};
       });
@@ -46,11 +46,11 @@ describe('useFirestore hooks', () => {
 
     it('should handle errors', async () => {
       const errorMessage = 'Permission denied';
-      (firestore.onSnapshot as jest.Mock).mockImplementation((q, ...args: any[]) => {
+      (firestore.onSnapshot as jest.Mock).mockImplementation((q, ...args: unknown[]) => {
         const observer = args[0];
         const onError = typeof observer === 'function' 
           ? args[1] 
-          : observer.error;
+          : (observer as { error?: (error: Error) => void }).error;
 
         if (onError) onError(new Error(errorMessage));
         return () => {};
@@ -67,9 +67,9 @@ describe('useFirestore hooks', () => {
 
   describe('useDocument', () => {
     it('should fetch a single document', async () => {
-      (firestore.onSnapshot as jest.Mock).mockImplementation((ref, ...args: any[]) => {
+      (firestore.onSnapshot as jest.Mock).mockImplementation((ref, ...args: unknown[]) => {
         const observer = args[0];
-        const next = typeof observer === 'function' ? observer : observer.next;
+        const next = typeof observer === 'function' ? observer : (observer as { next?: (snapshot: { exists: () => boolean; id: string; data: () => { title: string } }) => void }).next;
         if (next) next({
           exists: () => true,
           id: 'doc-1',
@@ -87,9 +87,9 @@ describe('useFirestore hooks', () => {
     });
 
     it('should return null if document does not exist', async () => {
-      (firestore.onSnapshot as jest.Mock).mockImplementation((ref, ...args: any[]) => {
+      (firestore.onSnapshot as jest.Mock).mockImplementation((ref, ...args: unknown[]) => {
         const observer = args[0];
-        const next = typeof observer === 'function' ? observer : observer.next;
+        const next = typeof observer === 'function' ? observer : (observer as { next?: (snapshot: { exists: () => boolean }) => void }).next;
         if (next) next({ exists: () => false });
         return () => {};
       });

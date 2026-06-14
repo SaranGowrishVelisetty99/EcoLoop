@@ -1,6 +1,4 @@
 import { renderHook, waitFor } from '@testing-library/react';
-import { useUserScans, useUserProjects, useUserPoints } from './useUserData';
-import * as firestore from 'firebase/firestore';
 
 jest.mock('firebase/firestore', () => ({
   collection: jest.fn(),
@@ -17,19 +15,53 @@ jest.mock('@/lib/firebase', () => ({
 describe('useUserData hooks', () => {
   const mockUserId = 'user-123';
 
+  let mockOnSnapshot: jest.Mock;
+
+  beforeEach(() => {
+    jest.resetModules();
+    mockOnSnapshot = jest.fn();
+    jest.doMock('firebase/firestore', () => ({
+      collection: jest.fn(),
+      query: jest.fn(),
+      where: jest.fn(),
+      onSnapshot: mockOnSnapshot,
+      doc: jest.fn(),
+    }));
+  });
+
+  const importHooks = async () => {
+    const hooks = await import('./useUserData');
+    return {
+      useUserScans: hooks.useUserScans,
+      useUserProjects: hooks.useUserProjects,
+      useUserPoints: hooks.useUserPoints,
+    };
+  };
+
   describe('useUserScans', () => {
-    it('should return empty scans and not loading if no userId', () => {
+    beforeEach(() => {
+      mockOnSnapshot = jest.fn();
+      jest.doMock('firebase/firestore', () => ({
+        collection: jest.fn(),
+        query: jest.fn(),
+        where: jest.fn(),
+        onSnapshot: mockOnSnapshot,
+        doc: jest.fn(),
+      }));
+    });
+
+    it('should return empty scans and not loading if no userId', async () => {
+      const { useUserScans } = await importHooks();
       const { result } = renderHook(() => useUserScans(null));
       expect(result.current.scans).toEqual([]);
       expect(result.current.loading).toBe(false);
     });
 
     it('should fetch scans for a given userId', async () => {
+      const { useUserScans } = await importHooks();
       const mockScans = [{ id: 'scan-1', detectedObject: 'Bottle' }];
-      (firestore.onSnapshot as jest.Mock).mockImplementation((q, ...args: any[]) => {
-        const observer = args[0];
-        const next = typeof observer === 'function' ? observer : observer.next;
-        if (next) next({
+      mockOnSnapshot.mockImplementation((q, callback) => {
+        callback({
           docs: mockScans.map(s => ({ id: s.id, data: () => s }))
         });
         return () => {};
@@ -43,12 +75,22 @@ describe('useUserData hooks', () => {
   });
 
   describe('useUserProjects', () => {
+    beforeEach(() => {
+      mockOnSnapshot = jest.fn();
+      jest.doMock('firebase/firestore', () => ({
+        collection: jest.fn(),
+        query: jest.fn(),
+        where: jest.fn(),
+        onSnapshot: mockOnSnapshot,
+        doc: jest.fn(),
+      }));
+    });
+
     it('should fetch projects for a given userId', async () => {
+      const { useUserProjects } = await importHooks();
       const mockProjects = [{ id: 'proj-1', status: 'saved' }];
-      (firestore.onSnapshot as jest.Mock).mockImplementation((q, ...args: any[]) => {
-        const observer = args[0];
-        const next = typeof observer === 'function' ? observer : observer.next;
-        next({
+      mockOnSnapshot.mockImplementation((q, callback) => {
+        callback({
           docs: mockProjects.map(p => ({ id: p.id, data: () => p }))
         });
         return () => {};
@@ -61,11 +103,21 @@ describe('useUserData hooks', () => {
   });
 
   describe('useUserPoints', () => {
+    beforeEach(() => {
+      mockOnSnapshot = jest.fn();
+      jest.doMock('firebase/firestore', () => ({
+        collection: jest.fn(),
+        query: jest.fn(),
+        where: jest.fn(),
+        onSnapshot: mockOnSnapshot,
+        doc: jest.fn(),
+      }));
+    });
+
     it('should fetch points from user document', async () => {
-      (firestore.onSnapshot as jest.Mock).mockImplementation((ref, ...args: any[]) => {
-        const observer = args[0];
-        const next = typeof observer === 'function' ? observer : observer.next;
-        next({
+      const { useUserPoints } = await importHooks();
+      mockOnSnapshot.mockImplementation((ref, callback) => {
+        callback({
           exists: () => true,
           data: () => ({ points: 500 })
         });

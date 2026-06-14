@@ -10,7 +10,7 @@ test.describe('Dashboard', () => {
     await expect(page.getByRole('button', { name: /Go to sign-in/i })).toBeVisible();
   });
 
-  test('shows welcome message when signed in', async ({ page }) => {
+  test('shows welcome message when signed in', async () => {
     // This would require a logged in user - skipped for now
     test.skip();
   });

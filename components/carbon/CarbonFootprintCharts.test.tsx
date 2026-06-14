@@ -1,19 +1,23 @@
 import { render, screen } from '@testing-library/react';
 import { CarbonFootprintCharts } from './CarbonFootprintCharts';
 
+interface RechartsComponentProps {
+  children: React.ReactNode;
+}
+
 // Mock Recharts to avoid JSDOM layout issues
 jest.mock('recharts', () => ({
-  ResponsiveContainer: ({ children }: any) => <div>{children}</div>,
-  PieChart: ({ children }: any) => <div data-testid="pie-chart">{children}</div>,
+  ResponsiveContainer: ({ children }: RechartsComponentProps) => <div>{children}</div>,
+  PieChart: ({ children }: RechartsComponentProps) => <div data-testid="pie-chart">{children}</div>,
   Pie: () => null,
   Cell: () => null,
-  BarChart: ({ children }: any) => <div data-testid="bar-chart">{children}</div>,
+  BarChart: ({ children }: RechartsComponentProps) => <div data-testid="bar-chart">{children}</div>,
   Bar: () => null,
   XAxis: () => null,
   YAxis: () => null,
   CartesianGrid: () => null,
   Tooltip: () => null,
-  AreaChart: ({ children }: any) => <div data-testid="area-chart">{children}</div>,
+  AreaChart: ({ children }: RechartsComponentProps) => <div data-testid="area-chart">{children}</div>,
   Area: () => null,
 }));
 

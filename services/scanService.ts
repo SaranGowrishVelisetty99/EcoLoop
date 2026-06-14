@@ -71,7 +71,7 @@ export function createScanService(db = adminDb, fieldValue = adminFieldValue): S
 
       const projectsQuery = db.collection('userProjects').where('scanId', '==', scanId);
       const projectsSnapshot = await projectsQuery.get();
-      projectsSnapshot.docs.forEach((doc: any) => {
+      projectsSnapshot.docs.forEach((doc: FirebaseFirestore.QueryDocumentSnapshot) => {
         batch.delete(doc.ref);
       });
 

@@ -1,5 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { useAuth, AuthProvider } from '../useAuth';
+import { onAuthStateChanged } from 'firebase/auth';
 
 jest.mock('firebase/auth', () => ({
   onAuthStateChanged: jest.fn(),
@@ -10,7 +11,10 @@ jest.mock('@/lib/firebase', () => ({
   auth: {},
 }));
 
-const { onAuthStateChanged } = require('firebase/auth');
+interface MockUser {
+  uid: string;
+  email: string;
+}
 
 function Wrapper({ children }: { children: React.ReactNode }) {
   return <AuthProvider>{children}</AuthProvider>;
@@ -22,7 +26,7 @@ describe('useAuth', () => {
   });
 
   it('returns loading initially and user after auth state changes', async () => {
-    let callback: (user: any) => void;
+    let callback: (user: MockUser | null) => void;
     (onAuthStateChanged as jest.Mock).mockImplementation((auth, cb) => {
       callback = cb;
       return () => {};
@@ -42,7 +46,7 @@ describe('useAuth', () => {
   });
 
   it('clears user when callback fires with null', async () => {
-    let callback: (user: any) => void;
+    let callback: (user: MockUser | null) => void;
     (onAuthStateChanged as jest.Mock).mockImplementation((auth, cb) => {
       callback = cb;
       return () => {};

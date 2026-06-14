@@ -1,11 +1,33 @@
-import { createScanService, ScanService, CreateScanResult } from '../scanService';
+import { createScanService, ScanService } from '../scanService';
+
+interface MockDoc {
+  get: jest.Mock;
+  update: jest.Mock;
+  delete: jest.Mock;
+}
+
+interface MockCollection {
+  add: jest.Mock;
+  doc: jest.Mock;
+  where: jest.Mock;
+}
+
+interface MockDb {
+  collection: jest.Mock;
+  batch: jest.Mock;
+}
+
+interface MockFieldValue {
+  serverTimestamp: jest.Mock;
+  increment: jest.Mock;
+}
 
 describe('ScanService', () => {
-  let mockDb: any;
-  let mockFieldValue: any;
+  let mockDb: MockDb;
+  let mockFieldValue: MockFieldValue;
   let service: ScanService;
-  let mockCollection: any;
-  let mockDoc: any;
+  let mockCollection: MockCollection;
+  let mockDoc: MockDoc;
 
   beforeEach(() => {
     mockDoc = {

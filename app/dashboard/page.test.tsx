@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { axe, toHaveNoViolations } from 'jest-axe';
-import DashboardPage from './page';
+import { toHaveNoViolations } from 'jest-axe';
 
 expect.extend(toHaveNoViolations);
 
@@ -10,7 +9,7 @@ jest.mock('next/navigation', () => ({
 
 jest.mock('firebase/auth', () => ({
   onAuthStateChanged: jest.fn((auth, callback) => {
-    callback({ uid: 'test-user', email: 'test@example.com' });
+    callback(null);
     return () => {};
   }),
   signOut: jest.fn(),
@@ -32,9 +31,7 @@ jest.mock('firebase/firestore', () => ({
 }));
 
 jest.mock('@/lib/firebase', () => ({
-  auth: {
-    currentUser: { uid: 'test-user', email: 'test@example.com', getIdToken: () => Promise.resolve('mock-token') },
-  },
+  auth: { currentUser: null },
   db: {},
 }));
 
@@ -58,10 +55,12 @@ jest.mock('@/components/carbon/CarbonFootprintGoals', () => ({
   CarbonFootprintGoals: () => <div data-testid="goals" />,
 }));
 
+import DashboardPage from './page';
+
 describe('DashboardPage', () => {
   it('renders without crashing', () => {
     render(<DashboardPage />);
-    expect(screen.getByText(/EcoLoop dashboard/i)).toBeInTheDocument();
+    expect(screen.getByText(/Sign in to view your upcycling dashboard/i)).toBeInTheDocument();
   });
 
   it('shows sign in card when not authenticated', () => {

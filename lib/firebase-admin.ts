@@ -4,6 +4,8 @@ import { getAuth, Auth } from 'firebase-admin/auth';
 import * as fs from 'fs';
 import * as path from 'path';
 
+type FirebaseCredential = ReturnType<typeof cert> | ReturnType<typeof applicationDefault>;
+
 export interface AdminConfig {
   projectId: string;
   serviceAccount?: string;
@@ -39,24 +41,24 @@ export function initializeAdmin(config: AdminConfig): { app: App; db: Firestore;
     adminAppInstance = apps[0];
   } else {
     console.log('[firebase-admin] Creating new Firebase admin app');
-    let credential: any;
-    const { serviceAccount, useApplicationDefault } = config;
+    let credential: FirebaseCredential | null = null;
+    const { serviceAccount } = config;
 
     if (serviceAccount) {
       try {
-        let serviceAccountData: any;
         const trimmed = serviceAccount.trim();
         console.log('[firebase-admin] Loading service account from:', trimmed);
         if (trimmed.startsWith('{')) {
           console.log('[firebase-admin] Service account is JSON string');
-          serviceAccountData = JSON.parse(trimmed);
+          const serviceAccountData = JSON.parse(trimmed);
+          credential = cert(serviceAccountData);
         } else {
           console.log('[firebase-admin] Service account is file path');
           const resolvedPath = resolveServiceAccountPath(trimmed);
           console.log('[firebase-admin] Resolved path:', resolvedPath);
           console.log('[firebase-admin] File exists:', fs.existsSync(resolvedPath));
           if (fs.existsSync(resolvedPath)) {
-            serviceAccountData = JSON.parse(fs.readFileSync(resolvedPath, 'utf8'));
+            const serviceAccountData = JSON.parse(fs.readFileSync(resolvedPath, 'utf8'));
             credential = cert(serviceAccountData);
             console.log('[firebase-admin] Service account credential created');
           } else {
@@ -147,6 +149,18 @@ export function getDefaultAdmin() {
   return result;
 }
 
-export const adminApp = { get: () => getDefaultAdmin().app } as any;
-export const adminDb = { get: () => getDefaultAdmin().db } as any;
-export const adminAuth = { get: () => getDefaultAdmin().auth } as any;
+interface AdminLazy {
+  get: () => App;
+}
+
+interface DbLazy {
+  get: () => Firestore;
+}
+
+interface AuthLazy {
+  get: () => Auth;
+}
+
+export const adminApp: AdminLazy = { get: () => getDefaultAdmin().app };
+export const adminDb: DbLazy = { get: () => getDefaultAdmin().db };
+export const adminAuth: AuthLazy = { get: () => getDefaultAdmin().auth };

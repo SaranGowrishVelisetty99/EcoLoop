@@ -1,11 +1,31 @@
 import { createProjectService, ProjectService, ProjectInput } from '../projectService';
 
+interface MockDoc {
+  get: jest.Mock;
+  update: jest.Mock;
+  delete: jest.Mock;
+}
+
+interface MockCollection {
+  add: jest.Mock;
+  doc: jest.Mock;
+  where: jest.Mock;
+}
+
+interface MockDb {
+  collection: jest.Mock;
+}
+
+interface MockFieldValue {
+  serverTimestamp: jest.Mock;
+}
+
 describe('ProjectService', () => {
-  let mockDb: any;
-  let mockFieldValue: any;
+  let mockDb: MockDb;
+  let mockFieldValue: MockFieldValue;
   let service: ProjectService;
-  let mockCollection: any;
-  let mockDoc: any;
+  let mockCollection: MockCollection;
+  let mockDoc: MockDoc;
 
   beforeEach(() => {
     mockDoc = {

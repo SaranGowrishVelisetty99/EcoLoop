@@ -1,11 +1,33 @@
 import { createUserService, UserService } from '../userService';
 
+interface MockDoc {
+  get: jest.Mock;
+  set: jest.Mock;
+  update: jest.Mock;
+  delete: jest.Mock;
+}
+
+interface MockCollection {
+  doc: jest.Mock;
+  orderBy: jest.Mock;
+  where: jest.Mock;
+}
+
+interface MockDb {
+  collection: jest.Mock;
+  runTransaction: jest.Mock;
+}
+
+interface MockFieldValue {
+  serverTimestamp: jest.Mock;
+}
+
 describe('UserService', () => {
-  let mockDb: any;
-  let mockFieldValue: any;
+  let mockDb: MockDb;
+  let mockFieldValue: MockFieldValue;
   let service: UserService;
-  let mockCollection: any;
-  let mockDoc: any;
+  let mockCollection: MockCollection;
+  let mockDoc: MockDoc;
 
   beforeEach(() => {
     mockDoc = {

@@ -33,7 +33,7 @@ export function CarbonFootprintCharts({ result, history = [] }: CarbonFootprintC
   ];
 
   const trendData = history.length > 0 
-    ? history.map((entry, index) => ({
+    ? history.map((entry) => ({
         month: entry.date.toLocaleDateString('en-US', { month: 'short' }),
         total: entry.totalKgCo2,
         transport: entry.breakdown.transport,
@@ -57,33 +57,32 @@ export function CarbonFootprintCharts({ result, history = [] }: CarbonFootprintC
           <CardContent className="p-0">
             <div className="flex h-64" aria-hidden="true">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
-                    paddingAngle={2}
-                    dataKey="value"
-                    nameKey="name"
-                    label={({ name, percent }) => `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`}
-                    labelLine={false}
-                  >
-                    {pieData.map((entry, _index) => (
-                      <Cell key={`cell-${_index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    formatter={(value: any) => value ? [`${value.toLocaleString()} kg CO₂`, ''] : ['', '']}
-                    contentStyle={{
-                      backgroundColor: '#0f1a17',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '12px',
-                    }}
-                  />
-                </PieChart>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  paddingAngle={2}
+                  dataKey="value"
+                  nameKey="name"
+                  label={({ name, percent }) => `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`}
+                  labelLine={false}
+                >
+                  {pieData.map((entry, _index) => (
+                    <Cell key={`cell-${_index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  formatter={(value: number) => value ? [`${value.toLocaleString()} kg CO₂`, ''] : ['', '']}
+                  contentStyle={{
+                    backgroundColor: '#0f1a17',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '12px',
+                  }}
+                />
+              </PieChart>
               </ResponsiveContainer>
             </div>
             <div className="mt-4 flex flex-wrap justify-center gap-4" aria-hidden="true">
@@ -129,8 +128,7 @@ export function CarbonFootprintCharts({ result, history = [] }: CarbonFootprintC
                   <XAxis type="number" tick={{ fill: '#94a3b8' }} tickFormatter={(v) => `${(v/1000).toFixed(1)}k`} />
                   <YAxis type="category" dataKey="name" tick={{ fill: '#94a3b8' }} width={60} />
                   <Tooltip
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    formatter={(value: any) => value ? [`${value.toLocaleString()} kg CO₂`, ''] : ['', '']}
+                    formatter={(value: number) => value ? [`${value.toLocaleString()} kg CO₂`, ''] : ['', '']}
                     contentStyle={{
                       backgroundColor: '#0f1a17',
                       border: '1px solid rgba(255,255,255,0.1)',
@@ -195,11 +193,10 @@ export function CarbonFootprintCharts({ result, history = [] }: CarbonFootprintC
                 <XAxis dataKey="month" tick={{ fill: '#94a3b8' }} />
                 <YAxis tick={{ fill: '#94a3b8' }} tickFormatter={(v) => `${(v/1000).toFixed(1)}k`} />
                 <Tooltip
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  formatter={((value: any, name: any) => [
+                  formatter={(value: number, name: string) => [
                     value ? (name === 'total' ? `${value.toLocaleString()} kg CO₂` : `${value.toLocaleString()} kg`) : '',
                     name ? (CATEGORY_LABELS[name] || name) : '',
-                  ]) as any}
+                  ]}
                   contentStyle={{
                     backgroundColor: '#0f1a17',
                     border: '1px solid rgba(255,255,255,0.1)',

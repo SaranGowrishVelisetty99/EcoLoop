@@ -1,5 +1,4 @@
-import { render, screen, waitFor, act } from '@testing-library/react';
-import { CarbonFootprintGoals } from './CarbonFootprintGoals';
+import { render, screen, waitFor } from '@testing-library/react';
 
 const mockAuth = { currentUser: null };
 
@@ -13,6 +12,16 @@ jest.mock('@/lib/firebase', () => ({
   firebaseApp: {},
   db: {},
   storage: {},
+}));
+
+// Mock lucide-react icons individually
+jest.mock('lucide-react', () => ({
+  Target: () => <span data-testid="target-icon" />,
+  Flag: () => <span data-testid="flag-icon" />,
+  X: () => <span data-testid="x-icon" />,
+  CheckCircle: () => <span data-testid="check-circle-icon" />,
+  Clock: () => <span data-testid="clock-icon" />,
+  AlertCircle: () => <span data-testid="alert-circle-icon" />,
 }));
 
 import * as auth from 'firebase/auth';
@@ -36,6 +45,7 @@ describe('CarbonFootprintGoals', () => {
   });
 
   it('renders empty state when no goals exist', async () => {
+    const { CarbonFootprintGoals } = await import('./CarbonFootprintGoals');
     render(<CarbonFootprintGoals userId={mockUserId} currentFootprint={null} />);
     
     await waitFor(() => {
@@ -44,6 +54,7 @@ describe('CarbonFootprintGoals', () => {
   });
 
   it('renders existing goals from API', async () => {
+    const { CarbonFootprintGoals } = await import('./CarbonFootprintGoals');
     (global.fetch as jest.Mock).mockImplementationOnce(() => 
       Promise.resolve({
         ok: true,

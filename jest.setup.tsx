@@ -2,18 +2,18 @@ import '@testing-library/jest-dom';
 import { TextEncoder, TextDecoder } from 'util';
 import { ReadableStream } from 'stream/web';
 
+// Set up globals FIRST before any other imports
 global.TextEncoder = TextEncoder;
-global.TextDecoder = TextDecoder as any;
-global.ReadableStream = ReadableStream as any;
+global.TextDecoder = TextDecoder;
+global.ReadableStream = ReadableStream;
 
 // Polyfill Web APIs for environments where they are missing (Node < 18)
-if (typeof global.fetch === 'undefined') {
-  const undici = require('undici');
-  global.fetch = undici.fetch;
-  global.Request = undici.Request;
-  global.Response = undici.Response;
-  global.Headers = undici.Headers;
-}
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const undici = require('undici');
+global.fetch = undici.fetch;
+global.Request = undici.Request;
+global.Response = undici.Response;
+global.Headers = undici.Headers;
 
 class MockIntersectionObserver {
   observe = jest.fn();
@@ -26,7 +26,7 @@ class MockIntersectionObserver {
   constructor(public callback: IntersectionObserverCallback, public options?: IntersectionObserverInit) {}
 }
 
-global.IntersectionObserver = MockIntersectionObserver as any;
+global.IntersectionObserver = MockIntersectionObserver as unknown as typeof IntersectionObserver;
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -110,9 +110,9 @@ jest.mock('next/navigation', () => ({
 
 jest.mock('lucide-react', () => {
   const icons = ['Leaf', 'Recycle', 'Sparkles', 'TimerReset', 'FolderOpen', 'CheckCircle', 'Award', 'Trash2', 'Trophy', 'User', 'Mail', 'Save', 'Loader2', 'ChevronLeft', 'AlertCircle', 'CheckCircle', 'Eye', 'EyeOff', 'ShieldCheck'];
-  const mockIcon = ({ children, ...props }: any) => <span data-testid="icon" {...props}>{children}</span>;
+  const mockIcon = ({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) => <span data-testid="icon" {...props}>{children}</span>;
   return icons.reduce((acc, name) => {
     acc[name] = mockIcon;
     return acc;
-  }, {} as any);
+  }, {} as Record<string, React.ComponentType<React.HTMLAttributes<HTMLSpanElement>>>);
 });

@@ -60,13 +60,13 @@ export function createProjectService(db = adminDb, fieldValue = adminFieldValue)
     async getProjectsByScan(scanId: string): Promise<ProjectDoc[]> {
       const query = projectsCollection.where('scanId', '==', scanId);
       const snapshot = await query.get();
-      return snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() } as ProjectDoc));
+      return snapshot.docs.map((doc: FirebaseFirestore.QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() } as ProjectDoc));
     },
 
     async getProjectsByUser(userId: string): Promise<ProjectDoc[]> {
       const query = projectsCollection.where('userId', '==', userId);
       const snapshot = await query.get();
-      return snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() } as ProjectDoc));
+      return snapshot.docs.map((doc: FirebaseFirestore.QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() } as ProjectDoc));
     },
   };
 }

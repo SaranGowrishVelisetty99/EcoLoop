@@ -51,16 +51,27 @@ jest.mock('@/lib/auth-verify', () => ({
   verifyIdToken: jest.fn(),
 }));
 
+interface MockRequestBody {
+  scanId?: string;
+  imageUrl?: string;
+  imageDataUrl?: string;
+}
+
+interface MockRequest {
+  json: () => Promise<MockRequestBody>;
+  headers: Map<string, string>;
+}
+
 describe('/api/scan POST', () => {
-  const createMockRequest = (body: any, token = 'valid-token') => {
+  const createMockRequest = (body: MockRequestBody, token = 'valid-token'): MockRequest => {
     return {
       json: () => Promise.resolve(body),
       headers: new Map([['authorization', `Bearer ${token}`]]),
-    } as any;
+    };
   };
 
-  let mockScanService: any;
-  let mockUserService: any;
+  let mockScanService: { createScan: jest.Mock };
+  let mockUserService: { getUser: jest.Mock };
 
   beforeEach(() => {
     jest.clearAllMocks();

@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Points already awarded' }, { status: 400 });
     }
 
-    await db.runTransaction(async (transaction: any) => {
+    await db.runTransaction(async (transaction: FirebaseFirestore.Transaction) => {
       const userRef = db.collection('users').doc(uid);
       transaction.update(userRef, {
         points: adminFieldValue.increment(points),

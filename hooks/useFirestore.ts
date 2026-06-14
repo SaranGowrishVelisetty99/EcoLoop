@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { 
   collection, 
   query, 
-  where, 
   onSnapshot, 
   orderBy, 
   limit, 

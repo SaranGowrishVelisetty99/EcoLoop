@@ -1,6 +1,4 @@
 import { POST } from '../route';
-import { createProjectService } from '@/services/projectService';
-import { createUserService } from '@/services/userService';
 import { getUidFromAuthHeader } from '@/lib/auth-verify';
 
 jest.mock('@/lib/firebase-admin', () => ({
@@ -33,25 +31,27 @@ jest.mock('@/lib/firebase-admin', () => ({
   },
 }));
 
-jest.mock('@/services/projectService', () => ({
-  createProjectService: jest.fn(),
-}));
-
-jest.mock('@/services/userService', () => ({
-  createUserService: jest.fn(),
-}));
-
 jest.mock('@/lib/auth-verify', () => ({
   getUidFromAuthHeader: jest.fn(),
   verifyIdToken: jest.fn(),
 }));
 
+interface MockRequestBody {
+  projectId?: string;
+  points?: number;
+}
+
+interface MockRequest {
+  json: () => Promise<MockRequestBody>;
+  headers: Map<string, string>;
+}
+
 describe('/api/award-points POST', () => {
-  const createMockRequest = (body: any, token = 'valid-token') => {
+  const createMockRequest = (body: MockRequestBody, token = 'valid-token'): MockRequest => {
     return {
       json: () => Promise.resolve(body),
       headers: new Map([['authorization', `Bearer ${token}`]]),
-    } as any;
+    };
   };
 
   beforeEach(() => {

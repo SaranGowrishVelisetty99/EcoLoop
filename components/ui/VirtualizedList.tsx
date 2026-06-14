@@ -16,10 +16,10 @@ interface VirtualizedListProps<T> {
   onResize?: React.UIEventHandler<HTMLDivElement>;
   onRowsRendered?: (info: { startIndex: number; stopIndex: number }) => void;
   overscanCount?: number;
-  rowComponent?: React.ComponentType<any>;
+  rowComponent?: React.ComponentType<unknown>;
   rowCount?: number;
   rowHeight?: number | ((index: number) => number);
-  rowProps?: Record<string, any>;
+  rowProps?: Record<string, unknown>;
   tagName?: React.ElementType;
   defaultHeight?: number;
   defaultWidth?: number;
@@ -52,9 +52,9 @@ export function VirtualizedList<T>({
   return (
     <div className={className} style={{ width, height }}>
       <List
-        // @ts-ignore - react-window types are incomplete
+        // @ts-expect-error - react-window types are incomplete
         height={typeof height === 'string' ? parseInt(height) : height}
-        // @ts-ignore - react-window types don't include width/height but component accepts them
+        // @ts-expect-error - react-window types don't include width/height but component accepts them
         width={typeof width === 'string' ? parseInt(width) : width}
         itemCount={items.length}
         itemSize={itemSize}

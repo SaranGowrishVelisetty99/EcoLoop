@@ -57,7 +57,7 @@ test.describe('Critical User Flows', () => {
   });
 
   test.describe('Scan → Project Creation → Dashboard Tracking', () => {
-    test('user can scan, create project, and track progress', async ({ page }) => {
+    test('user can scan, create project, and track progress', async () => {
       // This would require an authenticated user
       // Skipping for now as it requires test infrastructure
       test.skip('Requires authenticated user and test infrastructure');

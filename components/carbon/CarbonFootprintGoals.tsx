@@ -243,7 +243,7 @@ export function CarbonFootprintGoals({ currentFootprint, userId }: CarbonFootpri
           </div>
         )}
 
-        {goals.map((goal: any) => {
+        {goals.map((goal: CarbonFootprintGoal) => {
           const baseline = goal.baselineTotalKgCo2 ?? goal.baselineTotalKgCO2 ?? goal.baseline ?? 0;
           const targetReductionPct = goal.targetReductionPercentage ?? goal.targetReduction ?? 0;
           const progress = getGoalProgress({ ...goal, baselineTotalKgCo2: baseline, targetReductionPercentage: targetReductionPct });

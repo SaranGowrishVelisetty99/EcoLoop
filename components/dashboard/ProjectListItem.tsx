@@ -15,9 +15,6 @@ interface ProjectListItemProps {
 
 export const ProjectListItem = memo(function ProjectListItem({ project, status, onDelete }: ProjectListItemProps) {
   const router = useRouter();
-  const handleDelete = useCallback(() => {
-    onDelete(project.id);
-  }, [onDelete, project.id]);
 
   const navigate = useCallback(() => {
     router.push(`/dashboard/project/${project.id}`);

@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb, adminFieldValue } from '@/lib/firebase-admin';
+import { adminDb } from '@/lib/firebase-admin';
 import { getUidFromAuthHeader } from '@/lib/auth-verify';
+
+interface FirestoreDoc {
+  ref: FirebaseFirestore.DocumentReference;
+}
 
 export async function DELETE(
   request: NextRequest,
@@ -36,7 +40,7 @@ export async function DELETE(
 
     const projectsQuery = db.collection('userProjects').where('scanId', '==', scanId);
     const projectsSnapshot = await projectsQuery.get();
-    projectsSnapshot.docs.forEach((doc: any) => {
+    projectsSnapshot.docs.forEach((doc: FirestoreDoc) => {
       batch.delete(doc.ref);
     });
 

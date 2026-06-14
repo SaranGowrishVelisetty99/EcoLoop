@@ -32,8 +32,13 @@ export async function GET(request: NextRequest) {
 
     console.log('[API carbon-goals GET] userId:', uid, 'docs count:', snapshot.docs.length);
 
+    interface GoalDoc {
+      id: string;
+      data: () => { createdAt?: { toDate: () => Date }; targetDate?: { toDate: () => Date }; [key: string]: unknown };
+    }
+
     const goals = snapshot.docs
-      .map((doc: any) => ({
+      .map((doc: GoalDoc) => ({
         id: doc.id,
         ...doc.data(),
         createdAt: doc.data().createdAt?.toDate?.() || new Date(),

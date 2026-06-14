@@ -14,7 +14,7 @@ function ensureAdminDb() {
 async function awardPoints(uid: string, email: string | undefined, points: number) {
   const db = ensureAdminDb();
   const userRef = db.collection('users').doc(uid);
-  await db.runTransaction(async (transaction: any) => {
+  await db.runTransaction(async (transaction: FirebaseFirestore.Transaction) => {
     const userDoc = await transaction.get(userRef);
     if (userDoc.exists) {
       transaction.update(userRef, {
@@ -52,7 +52,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { scanId, imageUrl, imageDataUrl } = body as { scanId?: string; imageUrl?: string; imageDataUrl?: string };
+    interface ScanRequestBody {
+    scanId?: string;
+    imageUrl?: string;
+    imageDataUrl?: string;
+  }
+
+  const { scanId, imageUrl, imageDataUrl } = body as ScanRequestBody;
     const imageInput = imageDataUrl || imageUrl;
 
     if (!imageInput) {

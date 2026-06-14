@@ -4,14 +4,25 @@ jest.mock('./TransportSection', () => ({ TransportSection: () => <div data-testi
 jest.mock('./EnergySection', () => ({ EnergySection: () => <div data-testid="energy" /> }));
 jest.mock('./DietSection', () => ({ DietSection: () => <div data-testid="diet" /> }));
 jest.mock('./ConsumptionSection', () => ({ ConsumptionSection: () => <div data-testid="consumption" /> }));
+
+interface CardProps {
+  children: React.ReactNode;
+}
+
+interface ButtonProps {
+  children: React.ReactNode;
+  onClick?: () => void;
+  [key: string]: unknown;
+}
+
 jest.mock('@/components/ui/card', () => ({
-  Card: ({ children }: any) => <div>{children}</div>,
-  CardContent: ({ children }: any) => <div>{children}</div>,
-  CardHeader: ({ children }: any) => <div>{children}</div>,
-  CardTitle: ({ children }: any) => <div>{children}</div>,
+  Card: ({ children }: CardProps) => <div>{children}</div>,
+  CardContent: ({ children }: CardProps) => <div>{children}</div>,
+  CardHeader: ({ children }: CardProps) => <div>{children}</div>,
+  CardTitle: ({ children }: CardProps) => <div>{children}</div>,
 }));
 jest.mock('@/components/ui/button', () => ({
-  Button: ({ children, onClick, ...props }: any) => <button onClick={onClick} {...props}>{children}</button>,
+  Button: ({ children, onClick, ...props }: ButtonProps) => <button onClick={onClick} {...props}>{children}</button>,
 }));
 jest.mock('@/lib/carbonCalculations', () => ({
   calculateCarbonFootprint: jest.fn(),
@@ -23,8 +34,6 @@ jest.mock('@/lib/carbonCalculations', () => ({
   })),
 }));
 
-import { CarbonFootprintCalculator } from './CarbonFootprintCalculator';
-
 describe('CarbonFootprintCalculator', () => {
   const initialResult = {
     totalKgCo2PerYear: 5000,
@@ -34,7 +43,8 @@ describe('CarbonFootprintCalculator', () => {
     lastCalculated: new Date()
   };
 
-  it('updates state and displays current calculation', () => {
+  it('updates state and displays current calculation', async () => {
+    const { CarbonFootprintCalculator } = await import('./CarbonFootprintCalculator');
     const onSave = jest.fn();
     render(<CarbonFootprintCalculator initialResult={initialResult} onSave={onSave} />);
     

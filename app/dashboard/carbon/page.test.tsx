@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import CarbonFootprintPage from './page';
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: jest.fn() }),
@@ -7,7 +6,7 @@ jest.mock('next/navigation', () => ({
 
 jest.mock('firebase/auth', () => ({
   onAuthStateChanged: jest.fn((auth, callback) => {
-    callback({ uid: 'test-user', email: 'test@example.com' });
+    callback(null);
     return () => {};
   }),
   signOut: jest.fn(),
@@ -29,9 +28,7 @@ jest.mock('firebase/firestore', () => ({
 }));
 
 jest.mock('@/lib/firebase', () => ({
-  auth: {
-    currentUser: { uid: 'test-user', email: 'test@example.com', getIdToken: () => Promise.resolve('mock-token') },
-  },
+  auth: { currentUser: null },
   db: {},
 }));
 
@@ -47,10 +44,12 @@ jest.mock('@/components/carbon/CarbonFootprintGoals', () => ({
   CarbonFootprintGoals: () => <div data-testid="goals" />,
 }));
 
+import CarbonFootprintPage from './page';
+
 describe('CarbonFootprintPage', () => {
   it('renders without crashing', () => {
     render(<CarbonFootprintPage />);
-    expect(screen.getByText(/Carbon Footprint/i)).toBeInTheDocument();
+    expect(screen.getByText(/Sign in to view your carbon footprint/i)).toBeInTheDocument();
   });
 
   it('shows sign in card when not authenticated', () => {
