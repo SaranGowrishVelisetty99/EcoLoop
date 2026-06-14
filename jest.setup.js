@@ -1,10 +1,10 @@
 // Polyfill Web APIs FIRST - before any other imports
-import { TextEncoder, TextDecoder } from 'util';
-import { ReadableStream } from 'stream/web';
+const { TextEncoder, TextDecoder } = require('util');
+const { ReadableStream } = require('stream/web');
 
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
-global.ReadableStream = ReadableStream as unknown as typeof ReadableStream;
+global.ReadableStream = ReadableStream;
 
 // Polyfill fetch, Request, Response, Headers for Node.js
 const undici = require('undici');
@@ -14,20 +14,23 @@ global.Response = undici.Response;
 global.Headers = undici.Headers;
 
 // Now import testing library and set up mocks
-import '@testing-library/jest-dom';
+require('@testing-library/jest-dom');
 
 class MockIntersectionObserver {
-  observe = jest.fn();
-  disconnect = jest.fn();
-  unobserve = jest.fn();
-  takeRecords = jest.fn();
-  root = null;
-  rootMargin = '';
-  thresholds = [];
-  constructor(public callback: IntersectionObserverCallback, public options?: IntersectionObserverInit) {}
+  constructor(callback, options) {
+    this.callback = callback;
+    this.options = options;
+    this.observe = jest.fn();
+    this.disconnect = jest.fn();
+    this.unobserve = jest.fn();
+    this.takeRecords = jest.fn();
+    this.root = null;
+    this.rootMargin = '';
+    this.thresholds = [];
+  }
 }
 
-global.IntersectionObserver = MockIntersectionObserver as unknown as typeof IntersectionObserver;
+global.IntersectionObserver = MockIntersectionObserver;
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -111,9 +114,9 @@ jest.mock('next/navigation', () => ({
 
 jest.mock('lucide-react', () => {
   const icons = ['Leaf', 'Recycle', 'Sparkles', 'TimerReset', 'FolderOpen', 'CheckCircle', 'Award', 'Trash2', 'Trophy', 'User', 'Mail', 'Save', 'Loader2', 'ChevronLeft', 'AlertCircle', 'CheckCircle', 'Eye', 'EyeOff', 'ShieldCheck'];
-  const mockIcon = ({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) => <span data-testid="icon" {...props}>{children}</span>;
+  const mockIcon = ({ children, ...props }) => React.createElement('span', { 'data-testid': 'icon', ...props }, children);
   return icons.reduce((acc, name) => {
     acc[name] = mockIcon;
     return acc;
-  }, {} as Record<string, React.ComponentType<React.HTMLAttributes<HTMLSpanElement>>>);
+  }, {});
 });
