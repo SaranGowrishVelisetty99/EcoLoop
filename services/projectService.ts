@@ -25,7 +25,8 @@ export interface ProjectService {
 }
 
 export function createProjectService(db = adminDb, fieldValue = adminFieldValue): ProjectService {
-  const projectsCollection = db.collection('userProjects');
+  const firestoreDb = db.get();
+  const projectsCollection = firestoreDb.collection('userProjects');
 
   return {
     async createProject(input: ProjectInput): Promise<string> {

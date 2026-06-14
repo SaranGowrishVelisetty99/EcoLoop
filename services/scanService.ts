@@ -25,9 +25,10 @@ export interface ScanService {
 }
 
 export function createScanService(db = adminDb, fieldValue = adminFieldValue): ScanService {
+  const firestoreDb = db.get();
   return {
     async createScan(input: ScanInput): Promise<CreateScanResult> {
-      const scansCollection = db.collection('scans');
+      const scansCollection = firestoreDb.collection('scans');
       const scanDocRef = await scansCollection.add({
         userId: input.userId,
         imageUrl: input.imageUrl || null,
@@ -52,24 +53,24 @@ export function createScanService(db = adminDb, fieldValue = adminFieldValue): S
     },
 
     async updateScan(scanId: string, data: Partial<ScanDoc>): Promise<void> {
-      await db.collection('scans').doc(scanId).update({
+      await firestoreDb.collection('scans').doc(scanId).update({
         ...data,
         updatedAt: fieldValue.serverTimestamp(),
       });
     },
 
     async getScan(scanId: string): Promise<ScanDoc | null> {
-      const doc = await db.collection('scans').doc(scanId).get();
+      const doc = await firestoreDb.collection('scans').doc(scanId).get();
       if (!doc.exists) return null;
       return { id: doc.id, ...doc.data() } as ScanDoc;
     },
 
     async deleteScan(scanId: string): Promise<void> {
-      const batch = db.batch();
-      const scanRef = db.collection('scans').doc(scanId);
+      const batch = firestoreDb.batch();
+      const scanRef = firestoreDb.collection('scans').doc(scanId);
       batch.delete(scanRef);
 
-      const projectsQuery = db.collection('userProjects').where('scanId', '==', scanId);
+      const projectsQuery = firestoreDb.collection('userProjects').where('scanId', '==', scanId);
       const projectsSnapshot = await projectsQuery.get();
       projectsSnapshot.docs.forEach((doc: FirebaseFirestore.QueryDocumentSnapshot) => {
         batch.delete(doc.ref);

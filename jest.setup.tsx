@@ -1,19 +1,20 @@
-import '@testing-library/jest-dom';
+// Polyfill Web APIs FIRST - before any other imports
 import { TextEncoder, TextDecoder } from 'util';
 import { ReadableStream } from 'stream/web';
 
-// Set up globals FIRST before any other imports
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
-global.ReadableStream = ReadableStream;
+global.ReadableStream = ReadableStream as unknown as typeof ReadableStream;
 
-// Polyfill Web APIs for environments where they are missing (Node < 18)
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+// Polyfill fetch, Request, Response, Headers for Node.js
 const undici = require('undici');
 global.fetch = undici.fetch;
 global.Request = undici.Request;
 global.Response = undici.Response;
 global.Headers = undici.Headers;
+
+// Now import testing library and set up mocks
+import '@testing-library/jest-dom';
 
 class MockIntersectionObserver {
   observe = jest.fn();

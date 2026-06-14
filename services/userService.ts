@@ -9,7 +9,8 @@ export interface UserService {
 }
 
 export function createUserService(db = adminDb, fieldValue = adminFieldValue): UserService {
-  const usersCollection = db.collection('users');
+  const firestoreDb = db.get();
+  const usersCollection = firestoreDb.collection('users');
 
   return {
     async getUser(uid: string): Promise<UserDoc | null> {
@@ -30,7 +31,7 @@ export function createUserService(db = adminDb, fieldValue = adminFieldValue): U
 
     async awardPoints(uid: string, points: number): Promise<number> {
       const userRef = usersCollection.doc(uid);
-      await db.runTransaction(async (transaction: FirebaseFirestore.Transaction) => {
+      await firestoreDb.runTransaction(async (transaction: FirebaseFirestore.Transaction) => {
         const userDoc = await transaction.get(userRef);
         const currentPoints = userDoc.exists ? (userDoc.data()?.points || 0) : 0;
         const newPoints = currentPoints + points;

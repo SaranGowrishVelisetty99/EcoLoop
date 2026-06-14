@@ -52,10 +52,10 @@ export function VirtualizedList<T>({
   return (
     <div className={className} style={{ width, height }}>
       <List
-        // @ts-expect-error - react-window types are incomplete
-        height={typeof height === 'string' ? parseInt(height) : height}
-        // @ts-expect-error - react-window types don't include width/height but component accepts them
-        width={typeof width === 'string' ? parseInt(width) : width}
+        {...{
+          height: typeof height === 'string' ? parseInt(height) : height,
+          width: typeof width === 'string' ? parseInt(width) : width,
+        } as any} // eslint-disable-line @typescript-eslint/no-explicit-any
         itemCount={items.length}
         itemSize={itemSize}
         itemData={items}

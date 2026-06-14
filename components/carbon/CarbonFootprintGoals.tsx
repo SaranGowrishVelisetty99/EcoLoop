@@ -244,8 +244,8 @@ export function CarbonFootprintGoals({ currentFootprint, userId }: CarbonFootpri
         )}
 
         {goals.map((goal: CarbonFootprintGoal) => {
-          const baseline = goal.baselineTotalKgCo2 ?? goal.baselineTotalKgCO2 ?? goal.baseline ?? 0;
-          const targetReductionPct = goal.targetReductionPercentage ?? goal.targetReduction ?? 0;
+          const baseline = goal.baselineTotalKgCo2;
+          const targetReductionPct = goal.targetReductionPercentage;
           const progress = getGoalProgress({ ...goal, baselineTotalKgCo2: baseline, targetReductionPercentage: targetReductionPct });
           const status = getGoalStatus({ ...goal, baselineTotalKgCo2: baseline, targetReductionPercentage: targetReductionPct });
           const StatusIcon = status.icon;
