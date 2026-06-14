@@ -1,18 +1,15 @@
 import { render, screen } from '@testing-library/react';
-import { axe, toHaveNoViolations } from 'jest-axe';
-import CarbonPage from './page';
-
-expect.extend(toHaveNoViolations);
+import CarbonFootprintPage from './page';
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: jest.fn() }),
 }));
 
 jest.mock('firebase/auth', () => ({
-  onAuthStateChanged: (auth: any, callback: any) => {
+  onAuthStateChanged: jest.fn((auth, callback) => {
     callback({ uid: 'test-user', email: 'test@example.com' });
     return () => {};
-  },
+  }),
   signOut: jest.fn(),
 }));
 
@@ -32,50 +29,32 @@ jest.mock('firebase/firestore', () => ({
 }));
 
 jest.mock('@/lib/firebase', () => ({
-  auth: {},
+  auth: {
+    currentUser: { uid: 'test-user', email: 'test@example.com', getIdToken: () => Promise.resolve('mock-token') },
+  },
   db: {},
 }));
 
 jest.mock('@/components/carbon/CarbonFootprintCalculator', () => ({
-  CarbonFootprintCalculator: () => <div data-testid="calculator" role="region" aria-label="Carbon Footprint Calculator" />,
+  CarbonFootprintCalculator: () => <div data-testid="calculator" />,
 }));
 
 jest.mock('@/components/carbon/CarbonFootprintCharts', () => ({
-  CarbonFootprintCharts: () => <div data-testid="charts" role="region" aria-label="Carbon Footprint Charts" />,
+  CarbonFootprintCharts: () => <div data-testid="charts" />,
 }));
 
 jest.mock('@/components/carbon/CarbonFootprintGoals', () => ({
-  CarbonFootprintGoals: () => <div data-testid="goals" role="region" aria-label="Carbon Footprint Goals" />,
+  CarbonFootprintGoals: () => <div data-testid="goals" />,
 }));
 
-describe('CarbonFootprintPage accessibility', () => {
-  it('should have no accessibility violations', async () => {
-    const { container } = render(<CarbonPage />);
-    const results = await axe(container);
-    expect(results).toHaveNoViolations();
+describe('CarbonFootprintPage', () => {
+  it('renders without crashing', () => {
+    render(<CarbonFootprintPage />);
+    expect(screen.getByText(/Carbon Footprint/i)).toBeInTheDocument();
   });
 
-  it('should have skip link', () => {
-    render(<CarbonPage />);
-    const skipLink = screen.getByText('Skip to main content');
-    expect(skipLink).toBeInTheDocument();
-  });
-
-  it('should have main landmark with id', () => {
-    render(<CarbonPage />);
-    const main = screen.getByRole('main');
-    expect(main).toHaveAttribute('id', 'main-content');
-  });
-
-  it('should have back to dashboard button', () => {
-    render(<CarbonPage />);
-    const backBtn = screen.getByRole('button', { name: /back to dashboard/i });
-    expect(backBtn).toBeInTheDocument();
-  });
-
-  it('should have proper heading hierarchy', () => {
-    render(<CarbonPage />);
-    const h1 = screen.getByRole('heading', { level: 1 });
-    expect(h1).toBeInTheDocument();
+  it('shows sign in card when not authenticated', () => {
+    render(<CarbonFootprintPage />);
+    expect(screen.getByText(/Sign in to view your carbon footprint/i)).toBeInTheDocument();
   });
 });

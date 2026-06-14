@@ -1,6 +1,7 @@
 import { POST } from '../route';
 import { createProjectService } from '@/services/projectService';
 import { createUserService } from '@/services/userService';
+import { getUidFromAuthHeader } from '@/lib/auth-verify';
 
 jest.mock('@/lib/firebase-admin', () => ({
   adminDb: {
@@ -40,6 +41,11 @@ jest.mock('@/services/userService', () => ({
   createUserService: jest.fn(),
 }));
 
+jest.mock('@/lib/auth-verify', () => ({
+  getUidFromAuthHeader: jest.fn(),
+  verifyIdToken: jest.fn(),
+}));
+
 describe('/api/award-points POST', () => {
   const createMockRequest = (body: any, token = 'valid-token') => {
     return {
@@ -50,6 +56,7 @@ describe('/api/award-points POST', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    (getUidFromAuthHeader as jest.Mock).mockResolvedValue('user-1');
   });
 
   it('returns 400 without projectId or points', async () => {

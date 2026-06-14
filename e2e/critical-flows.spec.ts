@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import fs from 'fs';
+import path from 'path';
 
 test.describe('Critical User Flows', () => {
   test.describe('Complete Signup → Scan → Dashboard Flow', () => {
@@ -17,7 +19,7 @@ test.describe('Critical User Flows', () => {
       await page.click('button[type="submit"]');
       
       // Should redirect to dashboard after signup
-      await expect(page).toHaveURL(/\/dashboard/);
+      await expect(page).toHaveURL(/\/dashboard/, { timeout: 15000 });
       await expect(page.locator('text=Welcome')).toBeVisible({ timeout: 10000 });
       
       // 2. Go to scan page and upload an image
@@ -81,9 +83,7 @@ async function createTestImage(page) {
   
   // Convert data URL to file
   const buffer = Buffer.from(imageData.split(',')[1], 'base64');
-  const fs = require('fs');
-  const path = require('path');
-  const testImagePath = path.join(__dirname, '..', 'test-image.png');
+  const testImagePath = path.join(process.cwd(), 'test-image.png');
   fs.writeFileSync(testImagePath, buffer);
   return testImagePath;
 }

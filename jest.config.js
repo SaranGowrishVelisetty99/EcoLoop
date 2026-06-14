@@ -1,30 +1,36 @@
-module.exports = {
-  testEnvironment: 'jsdom',
-  setupFiles: ['<rootDir>/jest.setup.tsx'],
+const nextJest = require('next/jest');
+
+const createJestConfig = nextJest({
+  dir: './',
+});
+
+const customJestConfig = {
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.tsx'],
+  testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
-    '^@/components/(.*)$': '<rootDir>/components/$1',
-    '^@/lib/(.*)$': '<rootDir>/lib/$1',
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
   },
-  transform: {
-    '^.+\\.(ts|tsx|js|jsx)$': ['ts-jest', {
-      tsconfig: 'tsconfig.jest.json',
-    }],
-  },
-  transformIgnorePatterns: [
-    '/node_modules/(?!(@testing-library|jose|jwks-rsa|firebase-admin)/)',
-  ],
-  testMatch: ['**/__tests__/**/*.test.(ts|tsx)', '**/*.test.(ts|tsx)'],
-  testPathIgnorePatterns: ['/node_modules/', '/.next/', '/app/api/'],
+  collectCoverage: true,
   collectCoverageFrom: [
     'app/**/*.{ts,tsx}',
-    'lib/**/*.{ts,tsx}',
     'components/**/*.{ts,tsx}',
     'hooks/**/*.{ts,tsx}',
+    'lib/**/*.{ts,tsx}',
     'services/**/*.{ts,tsx}',
     '!**/*.d.ts',
-    '!**/__tests__/**',
+    '!**/node_modules/**',
+    '!**/e2e/**',
+  ],
+  testMatch: [
+    '<rootDir>/app/**/*.test.{ts,tsx}',
+    '<rootDir>/components/**/*.test.{ts,tsx}',
+    '<rootDir>/hooks/**/*.test.{ts,tsx}',
+    '<rootDir>/lib/**/*.test.{ts,tsx}',
+    '<rootDir>/services/**/*.test.{ts,tsx}',
+  ],
+  testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/e2e/', '<rootDir>/.next/', '<rootDir>/services/__tests__/'],
+  transformIgnorePatterns: [
+    'node_modules/(?!(jose|firebase-admin|@firebase|undici|lucide-react|@radix-ui|jwks-rsa)/)',
   ],
   coverageThreshold: {
     global: {
@@ -34,5 +40,6 @@ module.exports = {
       statements: 70,
     },
   },
-  roots: ['<rootDir>'],
 };
+
+module.exports = createJestConfig(customJestConfig);

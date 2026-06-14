@@ -1,7 +1,32 @@
+import '@testing-library/jest-dom';
 import { TextEncoder, TextDecoder } from 'util';
+import { ReadableStream } from 'stream/web';
 
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder as any;
+global.ReadableStream = ReadableStream as any;
+
+// Polyfill Web APIs for environments where they are missing (Node < 18)
+if (typeof global.fetch === 'undefined') {
+  const undici = require('undici');
+  global.fetch = undici.fetch;
+  global.Request = undici.Request;
+  global.Response = undici.Response;
+  global.Headers = undici.Headers;
+}
+
+class MockIntersectionObserver {
+  observe = jest.fn();
+  disconnect = jest.fn();
+  unobserve = jest.fn();
+  takeRecords = jest.fn();
+  root = null;
+  rootMargin = '';
+  thresholds = [];
+  constructor(public callback: IntersectionObserverCallback, public options?: IntersectionObserverInit) {}
+}
+
+global.IntersectionObserver = MockIntersectionObserver as any;
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

@@ -18,7 +18,7 @@ describe('Card', () => {
 
   it('applies custom className', () => {
     render(<Card className="custom-class">Content</Card>);
-    expect(screen.getByText('Content').closest('div')).toHaveClass('custom-class');
+    expect(screen.getByText('Content').closest('section')).toHaveClass('custom-class');
   });
 
   it('renders CardHeader, CardTitle, CardContent separately', () => {

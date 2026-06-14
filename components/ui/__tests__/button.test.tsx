@@ -17,7 +17,7 @@ describe('Button', () => {
   it('applies size classes', () => {
     render(<Button size="sm">Small</Button>);
     const btn = screen.getByRole('button');
-    expect(btn).toHaveClass('h-9');
+    expect(btn).toHaveClass('h-11');
   });
 
   it('calls onClick handler', () => {
@@ -33,8 +33,8 @@ describe('Button', () => {
   });
 
   it('shows loading state', () => {
-    render(<Button disabled>Loading…</Button>);
-    expect(screen.getByRole('button')).toHaveTextContent('Loading…');
+    render(<Button loading>Loading...</Button>);
+    expect(screen.getByRole('button')).toHaveTextContent('Loading...');
   });
 
   it('forwards ref', () => {

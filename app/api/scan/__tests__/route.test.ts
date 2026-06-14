@@ -1,6 +1,7 @@
 import { POST } from '../route';
 import { createScanService } from '@/services/scanService';
 import { createUserService } from '@/services/userService';
+import { getUidFromAuthHeader } from '@/lib/auth-verify';
 
 jest.mock('@/lib/firebase-admin', () => ({
   adminDb: {
@@ -45,6 +46,11 @@ jest.mock('firebase-admin/firestore', () => ({
   },
 }));
 
+jest.mock('@/lib/auth-verify', () => ({
+  getUidFromAuthHeader: jest.fn(),
+  verifyIdToken: jest.fn(),
+}));
+
 describe('/api/scan POST', () => {
   const createMockRequest = (body: any, token = 'valid-token') => {
     return {
@@ -59,6 +65,8 @@ describe('/api/scan POST', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     process.env.NVIDIA_NIM_API_KEY = 'test-key';
+
+    (getUidFromAuthHeader as jest.Mock).mockResolvedValue('user-1');
 
     mockScanService = {
       createScan: jest.fn(() => Promise.resolve({
